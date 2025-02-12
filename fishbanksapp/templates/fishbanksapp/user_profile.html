@@ -1,6 +1,10 @@
 {% extends 'fishbanksapp/base.html' %}
 {% block content %}
+{% if is_user%}
+<p>This is your profile!</p>
+{% endif %}
 <h1>{{ profile_user.username }}'s Profile</h1>
+<p>Current Balance: {{profile.balance}}</p>
 <p>Email: {{ profile_user.email }}</p>
 <p>Last Login: {{ profile_user.last_login }}</p>
 <a href="{% url 'leaderboard' %}">View All Users</a>

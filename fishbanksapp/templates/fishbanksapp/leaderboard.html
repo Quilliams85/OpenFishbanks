@@ -8,7 +8,8 @@
                 <a href="{% url 'user_profile' username=user.username %}">
                     {{ user.username }}
                 </a>
-                - Joined on {{ user.date_joined|date:"F j, Y" }}
+                <p>Current Balance: {{user.profile.balance}}</p>
+                <p>Joined on {{ user.date_joined|date:"F j, Y" }}</p>
             </li>
         {% endfor %}
     </ol>
