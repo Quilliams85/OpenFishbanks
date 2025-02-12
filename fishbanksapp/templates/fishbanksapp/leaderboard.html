@@ -1,0 +1,16 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+<body>
+    <h1>Top Fisheries</h1>
+    <ol type="1">
+        {% for user in users %}
+            <li>
+                <a href="{% url 'user_profile' username=user.username %}">
+                    {{ user.username }}
+                </a>
+                - Joined on {{ user.date_joined|date:"F j, Y" }}
+            </li>
+        {% endfor %}
+    </ol>
+</body>
+{% endblock %}

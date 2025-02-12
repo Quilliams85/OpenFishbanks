@@ -1,0 +1,11 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+<h1>Welcome to Your Dashboard, {{ user.username }}</h1>
+<p>This is where you can find all your information about your fishery! You will be able to see your balance, ships, transactions, and any other information regarding your fishing enterprise.</p>
+<p>Email: {{ user.email }}</p>
+<p>Last Login: {{ user.last_login }}</p>
+<form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Log Out</button>
+</form>
+{% endblock %}
