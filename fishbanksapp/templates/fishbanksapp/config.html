@@ -1,0 +1,57 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ship List</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="number"] {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ship List</h1>
+    <form method="post">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Stock</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ship, form in ships_and_forms %}
+                <tr>
+                    <td>{{ ship.name }}</td>
+                    <td>
+                        {{ form.stock }}
+                        {% if form.stock.errors %}
+                            <div class="error">{{ form.stock.errors }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button type="submit" name="ship_id" value="{{ ship.id }}">Update</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</body>
+
+{% endblock %}

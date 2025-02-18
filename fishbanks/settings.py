@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     "fishbanksapp",
     'register.apps.RegisterConfig',
     "crispy_forms",
-    "crispy_bootstrap4"
+    "crispy_bootstrap4",
+    "simple_history",
+    "celery"
 ]
 
 MIDDLEWARE = [
@@ -135,3 +137,12 @@ LOGOUT_URL = 'logout/'
 
 TIME_ZONE = 'America/New_York'
 USE_TZ = True  # Ensure USE_TZ is True to enable timezone support
+
+
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'increment-population-every-minute': {
+         'task': 'fishbanksapp.tasks.update_population',
+         'schedule': crontab(minute='*'),  # This runs the task every minute
+    },
+}

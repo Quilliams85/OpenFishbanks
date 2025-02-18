@@ -5,8 +5,9 @@ urlpatterns = [
     path('', views.home, name='home'),
     path("<int:id>", views.index, name='index'),
     path('shop/', views.shop, name='shop'),
-    path('buy_ship/<int:ship_id>/', views.buy_ship, name='buy_ship'),
-    path('myprofile/', views.profile, name='profile'),
+    path('myprofile/', views.myprofile, name='profile'),
     path('profile/<str:username>/', views.user_profile, name='user_profile'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
+    path('purchase_ship/<int:ship_id>/', views.purchase_ship, name='purchase_ship'),
+    path('config/', views.config, name='config')
 ]

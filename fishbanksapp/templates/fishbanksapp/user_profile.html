@@ -9,3 +9,19 @@
 <p>Last Login: {{ profile_user.last_login }}</p>
 <a href="{% url 'leaderboard' %}">View All Users</a>
 {% endblock %}
+
+
+from django.contrib.auth.models import User
+from fishbanksapp.models import UserProfile
+
+# Fetch the user
+user = User.objects.get(username="Quilliams")
+
+# Fetch the user's profile
+user_profile = user.Profile
+
+# Add 1000 to the balance
+user_profile.balance += 1000
+
+# Save the changes
+user_profile.save()

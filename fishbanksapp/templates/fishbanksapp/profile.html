@@ -1,11 +1,90 @@
 {% extends 'fishbanksapp/base.html' %}
 {% block content %}
-<h1>Welcome to Your Dashboard, {{ user.username }}</h1>
-<p>This is where you can find all your information about your fishery! You will be able to see your balance, ships, transactions, and any other information regarding your fishing enterprise.</p>
-<p>Email: {{ user.email }}</p>
-<p>Last Login: {{ user.last_login }}</p>
-<form action="{% url 'logout' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Log Out</button>
-</form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <style>
+        .ship-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .ship-card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 200px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .buy-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 7px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .buy-button:hover {
+            background-color: #45a049;
+        }
+        .sell-button {
+            background-color: #af4c4c;
+            color: white;
+            padding: 5px 7px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .sell-button:hover {
+            background-color: #8d3c3c;
+        }
+
+    </style>
+</head>
+    <body>
+    <h1>Welcome to Your Dashboard, {{ user.username }}</h1>
+    <p>This is where you can find all your information about your fishery! You will be able to see your balance, ships, transactions, and any other information regarding your fishing enterprise.</p>
+    <h2>Inventory</h2>
+    <p><strong>Balance:</strong> {{balance}}</p>
+    <p><strong>Ships:</strong></p>
+    <div class="ship-container">
+        {% for item in ships_and_quantities %}
+        <div class="ship-card">
+            <h2>{{ item.ship.name }}</h2>
+            <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+            <form action="{% url 'profile' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="buy-button">Reposition Ships</button>
+            </form>
+            <p></p>
+            <form action="{% url 'profile' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="sell-button">Auction Ships</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    <p></p>
+    <h2>User Info</h2>
+    <p>Email: {{ user.email }}</p>
+    <p>Last Login: {{ user.last_login }}</p>
+        {% if user.is_superuser %}
+            <p>You are an admin:</p>
+            <a href="{%url 'config'%}">
+                Go to Config Dashboard
+            </a>
+            <p></p>
+            <a href="{%url 'config'%}">
+                Go to Admin Dashboard
+            </a>
+            <p></p>
+        {% endif %}
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Log Out</button>
+    </form>
+</body>
+
 {% endblock %}

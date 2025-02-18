@@ -3,12 +3,12 @@
 <body>
     <h1>Top Fisheries</h1>
     <ol type="1">
-        {% for user in users %}
+        {% for key, value in ordered_users.items %}
             <li>
-                <a href="{% url 'user_profile' username=user.username %}">
-                    {{ user.username }}
+                <a href="{% url 'user_profile' username=key %}">
+                    {{ key }}
                 </a>
-                <p>Current Balance: {{user.profile.balance}}</p>
+                <p>Current Balance: {{ value }}</p>
                 <p>Joined on {{ user.date_joined|date:"F j, Y" }}</p>
             </li>
         {% endfor %}

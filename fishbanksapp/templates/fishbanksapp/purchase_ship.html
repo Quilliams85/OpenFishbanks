@@ -1,0 +1,51 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Ships</title>
+    <style>
+        .ship-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .ship-card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 200px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .buy-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .buy-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Buy Ships</h1>
+    <div class="ship-container">
+        {% for ship in ships %}
+        <div class="ship-card">
+            <h2>{{ ship.name }}</h2>
+            <p><strong>Price:</strong> ${{ ship.cost }}</p>
+            <p><strong>Fishing Rate:</strong> {{ ship.fishing_rate }} fish/turn</p>
+            <p>{{ ship.description }}</p>
+            <form action="{% url 'purchase_ship' ship.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="buy-button">Buy</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+{% endblock %}

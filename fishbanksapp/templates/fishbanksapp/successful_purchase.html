@@ -1,0 +1,5 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+<p>Congratulations, you just purchased a  {{item}}!</p>
+<a href="{% url 'shop' %}">Return to Shop</a>
+{% endblock %}
