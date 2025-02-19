@@ -23,7 +23,7 @@
     </style>
 </head>
 <body>
-    <h1>Ship List</h1>
+    <h2>Ship List</h1>
     <form method="post">
         {% csrf_token %}
         <table>
@@ -52,6 +52,16 @@
             </tbody>
         </table>
     </form>
+    <h2> Salmon Chart</h2>
+    <div>
+        {{ chart_html|safe }}
+    </div>
+    <h2> Population Updates</h2>
+    {%for record in history %}
+    <li>
+        <p>{{record.population}} on {{record.history_date}}</p>
+    </li>
+    {% endfor %}
 </body>
 
 {% endblock %}

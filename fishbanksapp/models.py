@@ -14,6 +14,7 @@ class Profile(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     ships_list = models.JSONField(default=dict, encoder=DjangoJSONEncoder)
+    history = HistoricalRecords()
  
     def __str__(self):
         return f"{self.user.username}'s Profile"

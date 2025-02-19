@@ -1,7 +1,9 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import ToDoList, Item, Ship
+from .models import ToDoList, Item, Ship, FishSpecies
 from django.contrib.auth.models import User
 from .forms import ShipForm
+import plotly.express as px
+import pandas as pd
 
 # Create your views here.
 
@@ -86,6 +88,24 @@ def leaderboard(request):
     return render(request, 'fishbanksapp/leaderboard.html', context)
 
 def config(request):
+    fish_history = FishSpecies.history.all()
+
+    salmon = FishSpecies.objects.get(id=1)
+    salmon_history = salmon.history.all()
+    dates = [record.history_date for record in salmon_history]
+    populations = [record.population for record in salmon_history]
+
+    data = pd.DataFrame({
+        'Date': dates,
+        'Population': populations
+    })
+
+    # Create the chart
+    fig = px.line(data, x='Date', y='Population', title=f"Population Change Over Time for {salmon.name}")
+
+    # Convert the chart to HTML
+    chart_html = fig.to_html(full_html=False)
+
     ships = Ship.objects.all()
     if request.method == 'POST':
         # Handle form submissions
@@ -101,6 +121,6 @@ def config(request):
         ships_and_forms = zip(ships, forms)
 
     if request.user.is_superuser:
-        return render(request, 'fishbanksapp/config.html', {'ships_and_forms': ships_and_forms})
+        return render(request, 'fishbanksapp/config.html', {'ships_and_forms': ships_and_forms, 'history':fish_history, 'chart_html': chart_html})
     else:
         return HttpResponse('NO ACCESS')
