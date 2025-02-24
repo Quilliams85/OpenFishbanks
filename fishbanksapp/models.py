@@ -60,6 +60,10 @@ class FishSpecies(models.Model):
     name = models.TextField(default=None)
     history = HistoricalRecords()
 
+    #growth parameters
+    C = models.FloatField(default=100000)
+    k = models.FloatField(default=0.01)
+
     def __str__(self):
         return f"Fish Stock: {self.population}, Value: ${self.value}"
     

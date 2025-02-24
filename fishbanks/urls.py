@@ -24,5 +24,4 @@ urlpatterns = [
     path("", include("fishbanksapp.urls")),
     path("register/", v.register, name="register"),
     path('', include("django.contrib.auth.urls")),
-    path('logout/', v.logout_view, name='logout'),
 ]

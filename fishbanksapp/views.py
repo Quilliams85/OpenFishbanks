@@ -95,14 +95,21 @@ def config(request):
     dates = [record.history_date for record in salmon_history]
     populations = [record.population for record in salmon_history]
 
+
     data = pd.DataFrame({
-        'Date': dates,
-        'Population': populations
+        'Date': dates[0:1000], 
+        'Population': populations[0:1000],
     })
 
     # Create the chart
     fig = px.line(data, x='Date', y='Population', title=f"Population Change Over Time for {salmon.name}")
-
+    fig.update_layout(
+    title=dict(text="Population Change Over Time", x=0.5, font=dict(size=20, color='darkblue')),
+    xaxis_title="Date",
+    yaxis_title="Population",
+    xaxis=dict(tickangle=-45, tickfont=dict(size=12)),
+    yaxis=dict(tickfont=dict(size=12)),
+    legend=dict(title='Legend', x=0.8, y=1.1))
     # Convert the chart to HTML
     chart_html = fig.to_html(full_html=False)
 

@@ -140,9 +140,20 @@ USE_TZ = True  # Ensure USE_TZ is True to enable timezone support
 
 
 from celery.schedules import crontab
+
+POPULATION_UPDATE_INTERVAL = '1'
+
+
 CELERY_BEAT_SCHEDULE = {
     'increment-population-every-minute': {
          'task': 'fishbanksapp.tasks.update_population',
-         'schedule': crontab(minute='*'),  # This runs the task every minute
+         #'schedule': 1.0,
+         'schedule': crontab(minute='*/{time}'.format(time=POPULATION_UPDATE_INTERVAL)),  # This runs the task every minute
     },
 }
+""" 
+'return-ships': {
+         'task': 'fishbanksapp.tasks.return_ships',
+         'schedule': 3.0,
+         #'schedule': crontab(minute='*/{time}'.format(time=POPULATION_UPDATE_INTERVAL)),  # This runs the task every minute
+    }, """
