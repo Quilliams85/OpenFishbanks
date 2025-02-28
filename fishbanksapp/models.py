@@ -4,6 +4,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.serializers.json import DjangoJSONEncoder
 from simple_history.models import HistoricalRecords
+import time
+from datetime import datetime
 
 
 
@@ -75,3 +77,20 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.user.username} sold {self.fish_sold} fish for ${self.revenue}"
+
+
+class InGameTime(models.Model):
+    start_time = models.FloatField(default=0)
+    game_start_time = models.FloatField(default=0)
+    time_scale = models.FloatField(default=365.0)
+    
+        
+    def resetTime(self):
+        self.start_time = time.time()
+
+    def getTime(self):
+        current_time = time.time()
+        return self.game_start_time + (current_time - self.start_time)*self.time_scale
+    
+    def formatTime(self, value):
+        return datetime.utcfromtimestamp(int(value)).strftime('%Y-%m-%d %H:%M:%S')

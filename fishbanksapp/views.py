@@ -1,14 +1,18 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import ToDoList, Item, Ship, FishSpecies
+from .models import ToDoList, Ship, FishSpecies, InGameTime
 from django.contrib.auth.models import User
 from .forms import ShipForm
 import plotly.express as px
 import pandas as pd
+from django.http import JsonResponse
+
 
 # Create your views here.
 
 def home(request):
-    return render(request, 'fishbanksapp/home.html', {"name":"test"})
+    t = InGameTime.objects.first()
+    current_time = t.formatTime(t.getTime())
+    return render(request, 'fishbanksapp/home.html', {"name":"test", "time": current_time})
 
 
 def index(request, id):
