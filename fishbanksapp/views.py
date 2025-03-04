@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import ToDoList, Ship, FishSpecies, InGameTime
+from .models import ToDoList, Ship, FishSpecies, InGameTime, Invoice
 from django.contrib.auth.models import User
 from .forms import ShipForm
 import plotly.express as px
@@ -9,10 +9,14 @@ from django.http import JsonResponse
 
 # Create your views here.
 
-def home(request):
+
+def get_game_time(request):
     t = InGameTime.objects.first()
-    current_time = t.formatTime(t.getTime())
-    return render(request, 'fishbanksapp/home.html', {"name":"test", "time": current_time})
+    return JsonResponse({'time': t.formatTime(t.getTime())})
+
+
+def home(request):
+    return render(request, 'fishbanksapp/home.html')
 
 
 def index(request, id):
@@ -46,6 +50,7 @@ def purchase_ship(request, ship_id):
     
 def myprofile(request):
     user = request.user
+    invoices = Invoice.objects.filter(user=user)
         
     balance = user.profile.balance
 
@@ -62,6 +67,7 @@ def myprofile(request):
         'profile_user': user,
         'balance': balance,
         'ships_and_quantities': ships_and_quantities,
+        'invoices': invoices
     }
     return render(request, 'fishbanksapp/profile.html', context)
 
@@ -135,3 +141,11 @@ def config(request):
         return render(request, 'fishbanksapp/config.html', {'ships_and_forms': ships_and_forms, 'history':fish_history, 'chart_html': chart_html})
     else:
         return HttpResponse('NO ACCESS')
+    
+def invoice(request, invoice_id):
+    user = request.user
+    invoice = get_object_or_404(Invoice, id=invoice_id)
+    profits = invoice.getProfit()
+    if invoice.user != user:
+        return None
+    return render(request, 'fishbanksapp/invoice.html', {'invoice':invoice, 'profit':profits, 'num':invoice_id})

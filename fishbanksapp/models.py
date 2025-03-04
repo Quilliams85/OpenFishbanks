@@ -47,6 +47,7 @@ class Item(models.Model):
 
 class Ship(models.Model):
     name = models.CharField(max_length=100)
+    fishing_capacity = models.IntegerField(default=0)
     cost = models.FloatField()
     stock = models.IntegerField(default=0)
     fishing_rate = models.IntegerField()
@@ -86,11 +87,38 @@ class InGameTime(models.Model):
     
         
     def resetTime(self):
-        self.start_time = time.time()
+        self.start_time = time.time
 
     def getTime(self):
         current_time = time.time()
         return self.game_start_time + (current_time - self.start_time)*self.time_scale
     
     def formatTime(self, value):
-        return datetime.utcfromtimestamp(int(value)).strftime('%Y-%m-%d %H:%M:%S')
+        return datetime.fromtimestamp(int(value)).strftime('%Y-%m-%d %I:%M%p')
+
+class Invoice(models.Model):
+    revenues = models.JSONField(default=dict, encoder=DjangoJSONEncoder)
+    costs = models.JSONField(default=dict, encoder=DjangoJSONEncoder)
+    date = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    def getProfit(self):
+        total_r = 0
+        total_c = 0
+        for i in self.costs.values():
+            total_c += i
+        for i in self.revenues.values():
+            total_r += i
+        return total_r-total_c
+    
+
+class Harbor(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.CharField(blank=True, null=True, max_length=400)
+    carrying_capacity = models.IntegerField(default=100000)
+    storage_fee = models.FloatField(default=5000)
+    def __str__(self):
+        return self.name
+
+
+
+

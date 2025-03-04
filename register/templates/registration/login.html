@@ -10,6 +10,8 @@ Login Here
 {% if user.is_authenticated %}
 <p>Already Logged in!</p>
 {% else %}
+<style>
+</style>
      <form method="post" class="from-group">
 	{% csrf_token %}
 	{{form|crispy}}

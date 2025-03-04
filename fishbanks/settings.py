@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -157,3 +158,5 @@ CELERY_BEAT_SCHEDULE = {
          'schedule': 3.0,
          #'schedule': crontab(minute='*/{time}'.format(time=POPULATION_UPDATE_INTERVAL)),  # This runs the task every minute
     }, """
+
+STATIC_URL = '/static/'
