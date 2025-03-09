@@ -22,13 +22,32 @@
         .dashboard-page p strong {
             color: #333;
         }
+        .dashboard-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .chart-container {
+            flex: 2;
+            max-width: 65%; /* Adjust width to give space for invoices */
+        }
+
+        .invoices-container {
+            flex: 1;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #E4ECF6;
+            border-radius: 8px;
+        }
         .ship-container {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
             margin-top: 20px;
         }
-        .ship-card {
+        .ship-card, .invoice-card {
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -36,21 +55,14 @@
             width: 200px;
             text-align: center;
             transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 10px;
         }
-        .ship-card:hover {
+        .ship-card:hover, .invoice-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
-        .ship-card h2 {
-            color: #007BFF;
-            margin-bottom: 15px;
-            font-size: 1.4em;
-        }
-        .ship-card p {
-            margin: 10px 0;
-            color: #555;
-        }
-        .buy-button, .sell-button {
+        .buy-button {
+            background-color: #4CAF50;
             color: white;
             padding: 10px 15px;
             border: none;
@@ -59,45 +71,9 @@
             font-size: 0.9em;
             transition: background-color 0.2s;
             width: 100%;
-            margin: 5px 0;
-        }
-        .buy-button {
-            background-color: #4CAF50;
         }
         .buy-button:hover {
             background-color: #45a049;
-        }
-        .sell-button {
-            background-color: #af4c4c;
-        }
-        .sell-button:hover {
-            background-color: #8d3c3c;
-        }
-        .user-info {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .user-info p {
-            margin: 10px 0;
-        }
-        .admin-links {
-            margin-top: 20px;
-        }
-        .admin-links a {
-            display: inline-block;
-            background-color: #007BFF;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            margin: 5px 0;
-            transition: background-color 0.2s;
-        }
-        .admin-links a:hover {
-            background-color: #005bb5;
         }
         .logout-button {
             background-color: #ff4444;
@@ -113,71 +89,49 @@
         .logout-button:hover {
             background-color: #cc0000;
         }
-        ol {
-            list-style-type: none;
-        }
-        ol li {
-            counter-increment: rank; /* Add counter for rank */
-            position: relative;
-        }
-        ol li::before {
-            content: counter(rank); /* Display the rank number */
-            position: absolute;
-            left: -40px;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: #007BFF;
-            color: #fff;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
     </style>
 </head>
-<body class="dashboard-page"> <!-- Added a class to scope the styles -->
+<body class="dashboard-page">
     <h1>Welcome to Your Dashboard, {{ user.username }}</h1>
     <p>This is where you can find all your information about your fishery! You will be able to see your balance, ships, transactions, and any other information regarding your fishing enterprise.</p>
 
-    <h2>Inventory</h2>
-    <p><strong>Balance:</strong> {{ balance }}</p>
-    <p><strong>Ships:</strong></p>
+    <h2>Financials</h2>
+    <p><strong>Current Balance:</strong> {{ balance }}</p>
+
+    <div class="dashboard-container">
+        <div class="chart-container">
+            {{ chart_html|safe }}
+        </div>
+        <div class="invoices-container">
+            <ol>
+                {% for invoice in invoices %}
+                <li>
+                    <div class="invoice-card">
+                        <p>Invoice for: {{ invoice.date }}</p>
+                        <form action="{% url 'invoice' invoice_id=invoice.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="buy-button">View Details</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+    <h2>Ship Inventory</h2>
     <div class="ship-container">
-        {% for item in ships_and_quantities %}
+        {% for ship in ships %}
         <div class="ship-card">
-            <h2>{{ item.ship.name }}</h2>
-            <p><strong>Quantity:</strong> {{ item.quantity }}</p>
-            <form action="{% url 'profile' %}" method="post">
+            <h2>{{ ship.nickname }}</h2>
+            <h3>{{ ship.name }}</h3>
+            <p><strong>Ship Location:</strong> {{ ship.harbor }}</p>
+            <form action="{% url 'modify' ship.id%}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="buy-button">Reposition Ships</button>
-            </form>
-            <form action="{% url 'profile' %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="sell-button">Auction Ships</button>
+                <button type="submit" class="buy-button">Modify Ship</button>
             </form>
         </div>
         {% endfor %}
-    </div>
-    <div>
-        <h2>Fishing Reports</h2>
-        <ol>
-            {% for invoice in invoices%}
-            <li>
-                <div class="ship-card">
-                    <p>Invoice for: {{invoice.date}}</p>
-                    <form action="{% url 'invoice' invoice_id=invoice.id%}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="buy-button">View Details</button>
-                    </form>
-                </div>
-                <p></p>
-            </li>
-            {% endfor %}
-        </ol>
     </div>
 
     <div class="user-info">
@@ -199,4 +153,4 @@
         <button type="submit" class="logout-button">Log Out</button>
     </form>
 </body>
-{% endblock %}f
+{% endblock %}

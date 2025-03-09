@@ -31,27 +31,25 @@ def create_profile(sender, instance, created, **kwargs):
 def save_profile(sender, instance, **kwargs):
     instance.profile.save()
 
-class ToDoList(models.Model):
+class Harbor(models.Model):
     name = models.CharField(max_length=200)
-    
+    description = models.CharField(blank=True, null=True, max_length=400)
+    carrying_capacity = models.IntegerField(default=100000)
+    storage_fee = models.FloatField(default=5000)
     def __str__(self):
         return self.name
 
-class Item(models.Model):
-    ToDoList = models.ForeignKey(ToDoList, on_delete=models.CASCADE)
-    text = models.CharField(max_length=300)
-    complete = models.BooleanField()
-        
-    def __str__(self):
-        return self.text
-
 class Ship(models.Model):
+    history = HistoricalRecords()
     name = models.CharField(max_length=100)
+    nickname = models.CharField(max_length=100, default='')
     fishing_capacity = models.IntegerField(default=0)
     cost = models.FloatField()
-    stock = models.IntegerField(default=0)
     fishing_rate = models.IntegerField()
     description = models.TextField(blank=True, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    damage = models.FloatField(default=0)
+    harbor = models.ForeignKey(Harbor, on_delete=models.SET_NULL, null=True, blank=True, related_name='ships_temp')  # New ForeignKey
 
     def __str__(self):
         return self.name
@@ -61,8 +59,9 @@ class FishSpecies(models.Model):
     population = models.IntegerField(default=10000)
     value = models.FloatField(default=1.0)
     name = models.TextField(default=None)
+    weight = models.FloatField(default=1.0)
     history = HistoricalRecords()
-
+    harbor = models.ForeignKey(Harbor, on_delete=models.SET_NULL, null=True, blank=True, related_name='fish')  # New ForeignKey
     #growth parameters
     C = models.FloatField(default=100000)
     k = models.FloatField(default=0.01)
@@ -87,7 +86,8 @@ class InGameTime(models.Model):
     
         
     def resetTime(self):
-        self.start_time = time.time
+        self.start_time = time.time()
+        self.save()
 
     def getTime(self):
         current_time = time.time()
@@ -110,15 +110,4 @@ class Invoice(models.Model):
             total_r += i
         return total_r-total_c
     
-
-class Harbor(models.Model):
-    name = models.CharField(max_length=200)
-    description = models.CharField(blank=True, null=True, max_length=400)
-    carrying_capacity = models.IntegerField(default=100000)
-    storage_fee = models.FloatField(default=5000)
-    def __str__(self):
-        return self.name
-
-
-
 

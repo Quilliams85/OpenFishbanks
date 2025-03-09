@@ -2,16 +2,6 @@
 {% block content %}
 <head>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
         ol {
             list-style-type: none;
             padding: 0;
@@ -76,7 +66,7 @@
                 <a href="{% url 'user_profile' username=key %}">
                     {{ key }}
                 </a>
-                <p>Current Balance: {{ value }}</p>
+                <p>Current Balance: ${{ value }}</p>
                 <p>Joined on {{ user.date_joined|date:"F j, Y" }}</p>
             </li>
         {% endfor %}

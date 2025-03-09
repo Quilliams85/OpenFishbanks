@@ -1,10 +1,12 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import ToDoList, Ship, FishSpecies, InGameTime, Invoice
+from .models import Ship, FishSpecies, InGameTime, Invoice, Harbor
+from django.db.models import Count
 from django.contrib.auth.models import User
-from .forms import ShipForm
+from .forms import ShipForm, ShipUpdateForm
 import plotly.express as px
 import pandas as pd
 from django.http import JsonResponse
+import json
 
 
 # Create your views here.
@@ -19,16 +21,8 @@ def home(request):
     return render(request, 'fishbanksapp/home.html')
 
 
-def index(request, id):
-    ls = ToDoList.objects.get(id=id)
-    item = ls.item_set.get(id=1)
-    return render(request, 'fishbanksapp/base.html', {"name":ls.name})
-
 def shop(request):
-    ships = []
-    for i in Ship.objects.all():
-        if i.stock > 0:
-            ships.append(i)
+    ships = Ship.objects.all().filter(owner=None)
     return render(request, 'fishbanksapp/shop.html', {'ships': ships})
 
 def purchase_ship(request, ship_id):
@@ -37,12 +31,8 @@ def purchase_ship(request, ship_id):
 
     if user.profile.balance >= ship.cost:
         user.profile.balance -= ship.cost
-        if str(ship.id) not in user.profile.ships_list:
-            user.profile.ships_list[str(ship.id)] = 1
-        else:
-            user.profile.ships_list[str(ship.id)] += 1
-        ship.stock -= 1
         user.profile.save()
+        ship.owner = user
         ship.save()
         return render(request, 'fishbanksapp/successful_purchase.html', {'item': ship.name})
     else:
@@ -53,21 +43,36 @@ def myprofile(request):
     invoices = Invoice.objects.filter(user=user)
         
     balance = user.profile.balance
+    ships = Ship.objects.filter(owner=user)
+    user_history = user.profile.history.all()
+    dates = [record.history_date for record in user_history]
+    balances = [record.balance for record in user_history]
 
-    # Get the ships and their quantities
-    ships_and_quantities = []
-    for ship_id, quantity in user.profile.ships_list.items():
-        ship = Ship.objects.get(id=int(ship_id))  # Fetch the Ship object
-        ships_and_quantities.append({
-            'ship': ship,
-            'quantity': quantity,
-        })
+
+    data = pd.DataFrame({
+        'Date': dates[0:1000], 
+        'Balance': balances[0:1000],
+    })
+
+    # Create the chart
+    fig = px.line(data, x='Date', y='Balance', title=f"Balance Change over time")
+    fig.update_layout(
+    title=dict(text="Balance over Time", x=0.5, font=dict(size=20, color='darkblue')),
+    xaxis_title="Date",
+    yaxis_title="Balance",
+    xaxis=dict(tickangle=-45, tickfont=dict(size=12)),
+    yaxis=dict(tickfont=dict(size=12)),
+    legend=dict(title='Legend', x=0.8, y=1.1))
+    # Convert the chart to HTML
+    chart_html = fig.to_html(full_html=False)
+
 
     context = {
         'profile_user': user,
         'balance': balance,
-        'ships_and_quantities': ships_and_quantities,
-        'invoices': invoices
+        'invoices': invoices,
+        'ships':ships,
+        'chart_html': chart_html,
     }
     return render(request, 'fishbanksapp/profile.html', context)
 
@@ -149,3 +154,28 @@ def invoice(request, invoice_id):
     if invoice.user != user:
         return None
     return render(request, 'fishbanksapp/invoice.html', {'invoice':invoice, 'profit':profits, 'num':invoice_id})
+
+def modify(request, ship_id):
+    user = request.user
+    ship = Ship.objects.get(id=ship_id)
+    harbors = Harbor.objects.all()
+    if ship.owner != user:
+        return None
+
+
+    if request.method == "POST":
+        form = ShipUpdateForm(request.POST, instance=ship)
+        if form.is_valid():
+            form.save()
+            return redirect('/myprofile')  # Redirect to 'myprofile' after saving
+    else:
+        form = ShipUpdateForm(instance=ship)
+    harbors_json = {harbor.id: {"name": harbor.name, "fee": harbor.storage_fee, "description": harbor.description} for harbor in harbors}
+
+    context = {
+        'ship': ship,
+        'harbors': harbors,
+        "form": form,
+        "harbors_json": json.dumps(harbors_json)
+    }
+    return render(request, 'fishbanksapp/modify.html', context)
