@@ -1,4 +1,5 @@
 {% extends 'fishbanksapp/base.html' %}
+{% load humanize %}
 {% block content %}
 <head>
     <meta charset="UTF-8">
@@ -96,7 +97,7 @@
     <p>This is where you can find all your information about your fishery! You will be able to see your balance, ships, transactions, and any other information regarding your fishing enterprise.</p>
 
     <h2>Financials</h2>
-    <p><strong>Current Balance:</strong> {{ balance }}</p>
+    <p><strong>Current Balance:</strong> {{ balance|intcomma }}</p>
 
     <div class="dashboard-container">
         <div class="chart-container">

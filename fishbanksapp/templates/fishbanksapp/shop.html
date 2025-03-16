@@ -1,4 +1,5 @@
 {% extends 'fishbanksapp/base.html' %}
+{% load humanize %}
 {% block content %}
 <head>
     <meta charset="UTF-8">
@@ -8,7 +9,7 @@
         .ship-container {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
+            justify-content: left;
             gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
@@ -17,9 +18,10 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            flex: 1 1 1; /* Adjust the width as needed */
+            min-width: 250px; /* Minimum width for each card */
             padding: 20px;
-            text-align: center;
+            text-align: left;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .ship-card:hover {
@@ -68,11 +70,11 @@
     <h1>Purchase From Manufacturers</h1>
     <div class="ship-container">
         {% for ship in ships %}
-        <div class="ship-card {% if forloop.counter > 3 %}hidden{% endif %}">
+        <div class="ship-card">
             <h2>{{ ship.name }}</h2>
-            <p><strong>Price:</strong> ${{ ship.cost }}</p>
-            <p><strong>Maximum Fishing Rate:</strong> {{ ship.fishing_rate }} fish/turn</p>
-            <p><strong>Maximum Capacity:</strong> {{ ship.fishing_capacity }} kg</p>
+            <p><strong>Price:</strong> ${{ ship.base_cost|intcomma }}</p>
+            <p><strong>Maximum Fishing Rate:</strong> {{ ship.fishing_rate|intcomma }} fish/turn</p>
+            <p><strong>Maximum Capacity:</strong> {{ ship.fishing_capacity|intcomma }} kg</p>
             <p><strong>Ships in Stock:</strong> 
                 <span class="{% if ship.stock <= 2 %}stock-low{% endif %}">{{ ship.stock }}</span>
             </p>
@@ -86,12 +88,6 @@
         </div>
         {% endfor %}
     </div>
-
-    {% if ships|length > 3 %}
-    <div style="text-align: center; margin-top: 20px;">
-        <button id="showAllButton" class="buy-button" onclick="showAllShips()">Show All</button>
-    </div>
-    {% endif %}
 
     <script>
         function showAllShips() {

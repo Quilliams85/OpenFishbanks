@@ -48,6 +48,12 @@
 </head>
 <body>
     <h1>{{ ship.nickname|default:ship.name }}</h1>
+    <h2>Ship Details</h2>
+    <p>Carrying Capacity: {{ship.fishing_capacity}}</p>
+    <p>Fishing Rate: {{ship.fishing_rate}}</p>
+    <p>Description: {{ship.description}}</p>
+
+
     <h2>Modify Ship</h2>
     
     <form method="post">

@@ -1,4 +1,5 @@
 {% extends 'fishbanksapp/base.html' %}
+{% load humanize %}
 {% block content %}
 <head>
     <style>
@@ -66,7 +67,7 @@
                 <a href="{% url 'user_profile' username=key %}">
                     {{ key }}
                 </a>
-                <p>Current Balance: ${{ value }}</p>
+                <p>Current Balance: ${{ value|intcomma }}</p>
                 <p>Joined on {{ user.date_joined|date:"F j, Y" }}</p>
             </li>
         {% endfor %}

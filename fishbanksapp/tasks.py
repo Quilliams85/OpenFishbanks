@@ -1,6 +1,6 @@
 from celery import shared_task
 from django.db.models import F
-from .models import FishSpecies, Profile, Ship, Invoice, InGameTime, Harbor
+from .models import FishSpecies, Profile, Ship, Invoice, InGameTime, Harbor, Gas
 from fishbanks.settings import POPULATION_UPDATE_INTERVAL
 from django.contrib.auth.models import User
 import numpy as np
@@ -30,22 +30,27 @@ def return_ships():
         costs = {}
         ships = Ship.objects.all().filter(owner=user)
         for ship in ships:
-            if ship.harbor == None:
-                break
-            fish_type = FishSpecies.objects.get(harbor=ship.harbor)
-            total_fish = float(ship.fishing_rate) * float(fish_type.population)
+            if ship.harbor != None:
+                fish_type = FishSpecies.objects.get(harbor=ship.harbor)
+                total_fish = float(ship.fishing_rate) * float(fish_type.population)
 
-            if total_fish > ship.fishing_capacity:
-                total_fish = ship.fishing_capacity
-            fish_type.population -= total_fish
-            fish_type.save()
+                if (total_fish*fish_type.weight) > ship.fishing_capacity:
+                    total_fish = ship.fishing_capacity / fish_type.weight
+                fish_type.population -= total_fish
+                if fish_type.population < 0:
+                    fish_type.population = 0
+                fish_type.save()
 
-            revenue = total_fish * float(fish_type.weight) * float(fish_type.value)
-            items[f'{fish_type.name} catch from {ship.nickname}'] = revenue
-            costs[f'gas for {ship.nickname}'] = 0
-            costs[f'worker salaries for {ship.nicknam}'] = 3 * ship.fishing_capacity
+                revenue = total_fish * float(fish_type.weight) * float(fish_type.value)
+                items[f'{fish_type.name} catch from {ship.nickname}'] = revenue
+                if Gas.objects.first() != None:
+                    costs[f'gas for {ship.nickname}'] = ship.fishing_capacity * Gas.objects.first().price
+                costs[f'worker salaries for {ship.nickname}'] = 3 * ship.fishing_capacity
 
         invoice = Invoice.objects.create(user=user, revenues=items, costs=costs, date=current_time)
         user.profile.balance += invoice.getProfit()
         user.save()
-    
+
+def update_market_value():
+    for species in FishSpecies:
+        species.value

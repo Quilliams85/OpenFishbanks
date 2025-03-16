@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import Ship, FishSpecies, InGameTime, Invoice, Harbor
+from .models import Ship, FishSpecies, InGameTime, Invoice, Harbor, ManufacturerShip
 from django.db.models import Count
 from django.contrib.auth.models import User
 from .forms import ShipForm, ShipUpdateForm
@@ -18,21 +18,22 @@ def get_game_time(request):
 
 
 def home(request):
-    return render(request, 'fishbanksapp/home.html')
+    harbors = Harbor.objects.all()
+    return render(request, 'fishbanksapp/home.html', {'harbors':harbors})
 
 
 def shop(request):
-    ships = Ship.objects.all().filter(owner=None)
+    ships = ManufacturerShip.objects.all()
     return render(request, 'fishbanksapp/shop.html', {'ships': ships})
 
 def purchase_ship(request, ship_id):
-    ship = get_object_or_404(Ship, id=ship_id)
+    ship = get_object_or_404(ManufacturerShip, id=ship_id)
     user = request.user
 
-    if user.profile.balance >= ship.cost:
-        user.profile.balance -= ship.cost
+    if user.profile.balance >= ship.base_cost:
+        user.profile.balance -= ship.base_cost
         user.profile.save()
-        ship.owner = user
+        ship.sellShip(user)
         ship.save()
         return render(request, 'fishbanksapp/successful_purchase.html', {'item': ship.name})
     else:
@@ -41,6 +42,7 @@ def purchase_ship(request, ship_id):
 def myprofile(request):
     user = request.user
     invoices = Invoice.objects.filter(user=user)
+    reversed_invoices = list(invoices)[::-1]
         
     balance = user.profile.balance
     ships = Ship.objects.filter(owner=user)
@@ -70,7 +72,7 @@ def myprofile(request):
     context = {
         'profile_user': user,
         'balance': balance,
-        'invoices': invoices,
+        'invoices': reversed_invoices,
         'ships':ships,
         'chart_html': chart_html,
     }

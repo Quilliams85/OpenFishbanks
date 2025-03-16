@@ -39,6 +39,7 @@ class Harbor(models.Model):
     def __str__(self):
         return self.name
 
+
 class Ship(models.Model):
     history = HistoricalRecords()
     name = models.CharField(max_length=100)
@@ -53,6 +54,16 @@ class Ship(models.Model):
 
     def __str__(self):
         return self.name
+    
+class ManufacturerShip(models.Model):
+    name = models.CharField(max_length=100)
+    fishing_capacity = models.IntegerField(default=0)
+    fishing_rate = models.IntegerField()
+    base_cost = models.FloatField()
+    description = models.TextField(blank=True, null=True)
+
+    def sellShip(self, customer):
+        Ship.objects.create(name=self.name, fishing_capacity=self.fishing_capacity, fishing_rate=self.fishing_rate, description=self.description, owner=customer, nickname=self.name, cost=self.base_cost)
 
     
 class FishSpecies(models.Model):
@@ -68,15 +79,6 @@ class FishSpecies(models.Model):
 
     def __str__(self):
         return f"Fish Stock: {self.population}, Value: ${self.value}"
-    
-class Transaction(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    fish_sold = models.IntegerField()
-    revenue = models.FloatField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.user.username} sold {self.fish_sold} fish for ${self.revenue}"
 
 
 class InGameTime(models.Model):
@@ -109,5 +111,10 @@ class Invoice(models.Model):
         for i in self.revenues.values():
             total_r += i
         return total_r-total_c
-    
 
+
+class Gas(models.Model):
+    price = models.FloatField(default=0.01)
+
+    def __str__(self):
+        return f"Gas price is {self.price} per fishing cycle per kg of fishing capacity on ship"

@@ -1,6 +1,89 @@
 {% extends 'fishbanksapp/base.html' %}
 {% block content %}
-<h1>Home Page</h1>
-<p>Welcome to Open Fishbanks!</p>
-<h2>Reports</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harbors</title>
+    <style>
+        .harbor-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .harbor-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .harbor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .harbor-card h2 {
+            color: #007BFF;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        .harbor-card p {
+            margin: 10px 0;
+            color: #555;
+        }
+        .harbor-card p strong {
+            color: #333;
+        }
+        .visit-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s;
+        }
+        .visit-button:hover {
+            background-color: #45a049;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Home Page</h1>
+    <p>Welcome to Open Fishbanks!</p>
+    <h1>Harbors</h1>
+    <div class="harbor-container">
+        {% for harbor in harbors %}
+        <div class="harbor-card {% if forloop.counter > 3 %}hidden{% endif %}">
+            <h2>{{ harbor.name }}</h2>
+            <p><strong>Fee:</strong> {{ harbor.storage_fee }}</p>
+            <p>{{ harbor.description }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if harbors|length > 3 %}
+    <div style="text-align: center; margin-top: 20px;">
+        <button id="showAllButton" class="visit-button" onclick="showAllHarbors()">Show All</button>
+    </div>
+    {% endif %}
+
+    <script>
+        function showAllHarbors() {
+            document.querySelectorAll('.harbor-card.hidden').forEach(harbor => {
+                harbor.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.display = 'none';
+        }
+    </script>
+</body>
+
 {% endblock %}

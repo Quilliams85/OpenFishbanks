@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap4",
     "simple_history",
-    "celery"
+    "celery",
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
