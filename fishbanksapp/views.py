@@ -80,8 +80,8 @@ def myprofile(request):
 
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
-    profile = user.profile  # Access the related profile
-    is_owner = (request.user == user)  # Check if the logged-in user is the profile owner
+    profile = user.profile
+    is_owner = (request.user == user) 
     if is_owner :
         return redirect('/myprofile/')
     context = {
@@ -139,9 +139,7 @@ def config(request):
                 form.save()
         return redirect('shop')  # Redirect to refresh the page
     else:
-        # Display forms for each ship
         forms = [ShipForm(prefix=str(ship.id), instance=ship) for ship in ships]
-        # Zip ships and forms together
         ships_and_forms = zip(ships, forms)
 
     if request.user.is_superuser:
@@ -169,7 +167,7 @@ def modify(request, ship_id):
         form = ShipUpdateForm(request.POST, instance=ship)
         if form.is_valid():
             form.save()
-            return redirect('/myprofile')  # Redirect to 'myprofile' after saving
+            return redirect('/myprofile')
     else:
         form = ShipUpdateForm(instance=ship)
     harbors_json = {harbor.id: {"name": harbor.name, "fee": harbor.storage_fee, "description": harbor.description} for harbor in harbors}
@@ -181,3 +179,46 @@ def modify(request, ship_id):
         "harbors_json": json.dumps(harbors_json)
     }
     return render(request, 'fishbanksapp/modify.html', context)
+
+def invoice_list(request):
+    user = request.user
+
+    invoices = Invoice.objects.all().filter(user=user)
+    invoices = list(invoices)[::-1]
+
+    return render(request, 'fishbanksapp/invoice_list.html', {'invoices':invoices})
+
+def user_finances(request):
+    user = request.user
+        
+    balance = user.profile.balance
+    user_history = user.profile.history.all()
+    dates = [record.history_date for record in user_history]
+    balances = [record.balance for record in user_history]
+
+
+    data = pd.DataFrame({
+        'Date': dates[0:1000], 
+        'Balance': balances[0:1000],
+    })
+
+    # Create the chart
+    fig = px.line(data, x='Date', y='Balance', title=f"Balance Change over time")
+    fig.update_layout(
+    title=dict(text="Balance over Time", x=0.5, font=dict(size=20, color='darkblue')),
+    xaxis_title="Date",
+    yaxis_title="Balance",
+    xaxis=dict(tickangle=-45, tickfont=dict(size=12)),
+    yaxis=dict(tickfont=dict(size=12)),
+    legend=dict(title='Legend', x=0.8, y=1.1))
+    # Convert the chart to HTML
+    chart_html = fig.to_html(full_html=False)
+
+
+    context = {
+        'profile_user': user,
+        'balance': balance,
+        'chart_html': chart_html,
+    }
+    return render(request, 'fishbanksapp/user_finances.html', context)
+

@@ -1,0 +1,122 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.sales-card, .statistics-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 45%;
+}
+
+.sales-amount {
+    font-size: 2em;
+    font-weight: bold;
+    color: #333;
+}
+
+.sales-change {
+    color: green;
+    font-weight: bold;
+}
+
+.sales-graph {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 150px;
+    margin-top: 20px;
+}
+
+.graph-bar {
+    width: 10%;
+    background-color: #007bff;
+    border-radius: 4px;
+}
+
+.dates {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.top-products ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.top-products li {
+    margin: 10px 0;
+    font-size: 0.9em;
+    color: #333;
+}
+
+.top-products span {
+    float: right;
+    font-weight: bold;
+}
+
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+</head>
+<body>
+    <div class="container">
+        <div class="sales-card">
+            <h2>Sales this week</h2>
+            <p class="sales-amount">$45,385</p>
+            <p class="sales-change">12.5% ↑</p>
+            <div class="sales-graph">
+                <!-- Example graph data -->
+                <div class="graph-bar" style="height: 80%;"></div>
+                <div class="graph-bar" style="height: 75%;"></div>
+                <div class="graph-bar" style="height: 70%;"></div>
+                <div class="graph-bar" style="height: 65%;"></div>
+                <div class="graph-bar" style="height: 60%;"></div>
+                <div class="graph-bar" style="height: 55%;"></div>
+                <div class="graph-bar" style="height: 50%;"></div>
+            </div>
+            <div class="dates">
+                <span>01 Feb</span>
+                <span>02 Feb</span>
+                <span>03 Feb</span>
+                <span>04 Feb</span>
+                <span>05 Feb</span>
+                <span>06 Feb</span>
+                <span>07 Feb</span>
+            </div>
+        </div>
+
+        <div class="statistics-card">
+            <h2>Statistics this month</h2>
+            <div class="top-products">
+                <h3>Top Products</h3>
+                <ul>
+                    <li>iPhone 14 Pro ↑ 2.5% vs last month <span>$445,467</span></li>
+                    <li>Apple iMac 27* ↑ 12.5% vs last month <span>$256,982</span></li>
+                    <li>Apple Watch SE ↓ 1.35% vs last month <span>$201,869</span></li>
+                    <li>Apple iPad Air ↑ 12.5% vs last month <span>$103,967</span></li>
+                    <li>Apple iMac 24* ↓ 2% vs last month <span>$98,543</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+{% endblock %}

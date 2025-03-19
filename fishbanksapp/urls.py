@@ -13,4 +13,6 @@ urlpatterns = [
     path('api/get-time/', get_game_time, name='get-game-time'),
     path('invoice/<str:invoice_id>',views.invoice, name='invoice'),
     path('modify/<str:ship_id>', views.modify, name='modify'),
+    path('invoices', views.invoice_list, name='invoice_list'),
+    path('finances', views.user_finances, name='user_finances')
 ]

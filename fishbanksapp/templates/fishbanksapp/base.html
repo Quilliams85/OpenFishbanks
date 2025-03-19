@@ -1,127 +1,59 @@
 {% load static %}
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<!-- Google Fonts: Inter -->
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-	
-	<style type="text/css">
-		/* Apply modern font */
-		body {
-			font-family: 'Inter', sans-serif;
-		}
-
-		.sidenav {
-			height: 100%;
-			width: 160px;
-			position: fixed;
-			z-index: 1;
-			top: 0;
-			left: 0;
-			background-color: #111;
-		}    
-
-		.sidenav a {
-			padding: 6px 8px;
-			text-decoration: none;
-			font-size: 18px;
-			font-weight: 400;
-			color: #b0b0b0;
-			display: block;
-			transition: color 0.3s ease;
-		}  
-
-		.sidenav a:hover {
-			color: #ffffff;
-		}     
-
-		.main {
-			margin-left: 160px;
-			padding: 0px 10px;
-		}
-
-		/* Modernized Top Bar */
-		.topbar {
-			position: fixed;
-			top: 0;
-			left: 160px;
-			width: calc(100% - 160px);
-			height: 50px;
-			background-color: #222;
-			color: white;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0 20px;
-			box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-			z-index: 2;
-			font-weight: 600;
-			letter-spacing: 0.5px;
-			overflow: hidden;
-			white-space: nowrap;
-		}
-
-		.topbar .topbar-text {
-			font-size: 18px;
-			max-width: 90%;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-
-		/* Push content down to avoid overlap */
-		#content {
-			margin-top: 60px;
-		}
-		#game-time {
-		transition: opacity 0.5s ease-in-out;
-		opacity: 1;
-		font-size: 1rem; /* Adjust size if needed */
-		}
-		body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
-        }
-		h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Open Fishbanks {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-
 <body>
-	<!-- Top Bar -->
-	<div class="topbar">
-		<h3>Open Fishbanks</h3>
-		<div style="width:200px;float: left;">
-			<span id="game-date">Loading...</span> <!-- Static date part -->
-			<span id="game-time">Loading...</span> <!-- Dynamic time part -->
-		</div>
-		<script src="{% static 'fishbanksapp/js/game_time.js' %}"></script>
-	</div>
-
-	<!-- Sidebar -->
-	<div class="sidenav">
-		<a href="/">Home</a>
+    <div class="top-bar">
+        <div class="logo">OpenFishbanks</div>
+        <div style="width:200px;float: center;">
+            <span id="game-date">Loading...</span> <!-- Static date part -->
+            <span id="game-time">Loading...</span> <!-- Dynamic time part -->
+        </div>
+        <script src="{% static 'fishbanksapp/js/game_time.js' %}"></script>
         {% if user.is_authenticated %}
-        <a href="/shop">Shop</a>
-        <a href="/leaderboard">Leaderboard</a>
-        <a href="/myprofile">My Fishery</a>
-        {%else%}
-		<a href="/login">Login</a>
-        {%endif%}
-	</div>
+        <div class="user-info">
+            <span>Welcome, {{user.username}}</span>
+        </div>
+        {% else %}
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="login-button"><strong>Login</strong></button>
+        </form>
+        {% endif %}
+    </div>
 
-	<!-- Main Content -->
-	<div id="content" name="content" class="main">
-		<div class="row justify-content-center">
-			<div class="col-8">
-                    {% block content %}
-                    {% endblock %}
-			</div>
-		</div>
-	</div>
+    <div class="container">
+        <div class="side-bar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="/shop">Shop</a></li>
+                <li><a href="/leaderboard">Leaderboard</a></li>
+                <li>
+                    <details>
+                        <summary>My Fishery</summary>
+                        <ul>
+                            <li><a href="/myprofile">Profile</a></li>
+                            <li><a href="/invoices">Invoices</a></li>
+                            <li><a href="#">Transactions</a></li>
+                            <li><a href="#">Ships</a></li>
+                            <li><a href="#">Finances</a></li>
+                            <li><a href="#">Groups</a></li>
+                        </ul>
+                    </details>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
 </body>
+</html>

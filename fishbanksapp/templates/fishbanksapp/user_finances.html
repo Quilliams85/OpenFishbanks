@@ -1,0 +1,8 @@
+{% extends 'fishbanksapp/base.html' %}
+{% load humanize %}
+{% block content %}
+<p><strong>Current Balance:</strong> {{ balance|intcomma }}</p>
+<div class="chart-container">
+    {{ chart_html|safe }}
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'fishbanksapp/base.html' %}
+{% load humanize %}
+{% block content %}
+<body>
+        <h2>Invoices</h2>
+        <div class="invoices-header">
+            <h3>Item</h3>
+            <h3>Date</h3>
+            <h3>Profit</h3>
+            <h3>Details</h3>
+            
+        </div>
+        <hr/>
+            {% for invoice in invoices %}
+                <div class="invoice-card">
+                    <p>Fishing Report</p>
+                    <p>{{invoice.date}}</p>
+                    <p>{{invoice.getProfit|intcomma}} {% if invoice.getProfit > 0 %}&uarr;{% else %}{% if invoice.getProfit != 0%}&darr;{% endif %}{% endif %}</p>
+
+                    <form action="{% url 'invoice' invoice_id=invoice.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="buy-button">View Details</button>
+                    </form>
+                </div>
+            {% endfor %}
+</body>
+{% endblock %}
