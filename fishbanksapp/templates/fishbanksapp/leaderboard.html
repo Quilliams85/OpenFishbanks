@@ -67,6 +67,11 @@
                 <a href="{% url 'user_profile' username=key %}">
                     {{ key }}
                 </a>
+                {% for org in groups %}
+                {% if user in org.members.all %}
+                <p>{{org.name}}</p>
+                {% endif %}
+                {% endfor %}
                 <p>Current Balance: ${{ value|intcomma }}</p>
                 <p>Joined on {{ user.date_joined|date:"F j, Y" }}</p>
             </li>

@@ -1,0 +1,32 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+<h1>{{user.username}}'s Ships</h1>
+<div class="dashboard">
+    {% for loc in locations %}
+    <div class="card" style="grid-column: span 3;">
+        {% if loc.name == None %}
+        <h2>Unassigned Ships</h2>
+        {% else %}
+        <h2>Ships at {{loc.name}}</h2>
+        <p>{{loc.description}}</p>
+        <p><strong>Storage Fee:</strong> ${{loc.storage_fee}}</p>
+        {% endif %}
+        <div class="ship-container">
+            {% for ship in ships%}
+                {% if ship.harbor == loc %}
+                <div class="ship-card" style="background-color:#EEEEEE;">
+                    <h2>{{ ship.nickname }}</h2>
+                    <h3>{{ ship.name }}</h3>
+                    <p><strong>Ship Location:</strong> {{ ship.harbor }}</p>
+                    <form action="{% url 'modify' ship.id%}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="buy-button">Modify Ship</button>
+                    </form>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

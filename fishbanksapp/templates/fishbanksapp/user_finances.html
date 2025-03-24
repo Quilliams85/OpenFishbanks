@@ -1,8 +1,44 @@
 {% extends 'fishbanksapp/base.html' %}
 {% load humanize %}
 {% block content %}
-<p><strong>Current Balance:</strong> {{ balance|intcomma }}</p>
-<div class="chart-container">
-    {{ chart_html|safe }}
+<h1>Finances</h1>
+<div class="dashboard">
+
+
+    <div class="card">
+        <h2>Current Balance</h2>
+        <h3>${{ balance|intcomma }}</h3>
+    </div>
+    <div class="card">
+        <h2>Invoices</h2>
+        <form action="{% url 'invoice_list' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy-button">View Invoices</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>This Year's Return</h2>
+        {%if balance_increase > 0 %}
+        <h3 style="color:green;">
+            <strong>${{balance_increase|intcomma}}&uarr;</strong>
+        </h3>
+        {% else %}
+            {% if balance_increase == 0 %}
+            <h3><strong>${{balance_increase|intcomma}}</strong></h3>
+            {% else %}
+            <h3 style="color:red;">
+                <strong>${{balance_increase|intcomma}}&darr;</strong>
+            </h3>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="card" style="grid-column: span 3;">
+        <h2>Balance History</h2>
+        <div class="chart-container" style="max-width: 100%;">
+            {{ chart_html|safe }}
+        </div>
+    </div>
+    
 </div>
 {% endblock %}

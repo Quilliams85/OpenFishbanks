@@ -1,0 +1,72 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+<h1>{{user.username}}'s Organizations</h1>
+{% if not groups %}
+<p>You are not part of an organization, create one <a href='group/create/'>here</a></p>
+{% else %}
+<div class="dashboard">
+    {% for group in groups %}
+    <div class="card">
+        <h2> {{group.name}}</h2>
+        {% if group.owner == user%}
+        <p><i>You are the Owner of this Organization</i></p>
+        <p><strong>Description:</strong>{{group.description}}</p>
+        <h3>Members</h3>
+        <ol>
+            {% for member in group.members.all %}
+            <li>
+                {{member.username}}
+            </li>
+            {% endfor %}
+        </ol>
+        <form action="{% url 'group_detail' group.id%}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy-button">Edit Group</button>
+        </form>
+        {% else %}
+        <p><strong>Owner:</strong>{{group.owner}}</p>
+        <p>Status: Member</p>
+        <p><strong>Description:</strong>{{group.description}}</p>
+        <h3>Members</h3>
+        <ol>
+            {% for member in group.members.all %}
+            <li>
+                {{member.username}}
+            </li>
+            {% endfor %}
+        </ol>
+        <form action="{% url 'group_detail' group.id%}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy-button" style="width:auto;">View Group</button>
+        </form>
+        <form action="{% url 'leave_group' group.id%}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy-button" style="background-color:red; width:auto;" onclick="return confirm('Are you sure you want to leave this group?');">
+                Leave Group
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<h2>Invitations</h2>
+<div class="dashboard">
+    {% for inv in invitations %}
+    <div class="card">
+        <h3>Invitation to Join {{inv.group}}</h3>
+        <p>Sent by {{inv.sender}} on {{inv.created_at}}</p>
+        <form action="{% url 'accept_invitation' inv.id%}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy-button" style="background-color:green; width:auto;">Accept</button>
+        </form>
+        <form action="{% url 'decline_invitation' inv.id%}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy-button" style="background-color:red; width:auto;">Decline</button>
+        </form>
+
+    </div>
+    {% endfor %}    
+</div>
+
+{% endblock %}

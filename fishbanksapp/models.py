@@ -7,7 +7,33 @@ from simple_history.models import HistoricalRecords
 import time
 from datetime import datetime
 
+class Group(models.Model):
+    history = HistoricalRecords()
+    name = models.CharField(max_length=200, blank=True)
+    description = models.TextField(blank=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_organizations', null=True)
+    members = models.ManyToManyField(User, related_name='organizations')
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+
+
+class Invitation(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+    ]
+
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_invitations')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_invitations')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='invitations')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Invitation from {self.sender} to {self.recipient} for {self.organization}"
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -17,7 +43,6 @@ class Profile(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     ships_list = models.JSONField(default=dict, encoder=DjangoJSONEncoder)
     history = HistoricalRecords()
- 
     def __str__(self):
         return f"{self.user.username}'s Profile"
     
@@ -30,6 +55,37 @@ def create_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+
+
+class Transaction(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='transaction_sender')
+    reciever = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='transaction_reciever')
+    date = models.TimeField(default=None)
+    type = models.CharField(max_length=200, null=True, default=None)
+    def __str__(self):
+        return f"{self.sender} sent item to {self.reciever} on {self.date}"
+    
+class InGameTime(models.Model):
+    start_time = models.FloatField(default=0)
+    game_start_time = models.FloatField(default=0)
+    time_scale = models.FloatField(default=365.0)
+    
+        
+    def resetTime(self):
+        self.start_time = time.time()
+        self.save()
+
+    def getTime(self):
+        current_time = time.time()
+        return self.game_start_time + (current_time - self.start_time)*self.time_scale
+    
+    def formatTime(self, value):
+        return datetime.fromtimestamp(int(value)).strftime('%Y-%m-%d %I:%M%p')
+    
+    def getFormattedTime(self):
+        value = self.getTime()
+        return self.formatTime(value)
 
 class Harbor(models.Model):
     name = models.CharField(max_length=200)
@@ -64,6 +120,8 @@ class ManufacturerShip(models.Model):
 
     def sellShip(self, customer):
         Ship.objects.create(name=self.name, fishing_capacity=self.fishing_capacity, fishing_rate=self.fishing_rate, description=self.description, owner=customer, nickname=self.name, cost=self.base_cost)
+        date = InGameTime.objects.first().getFormattedTime()
+        Transaction.objects.create(type='P2P Ship', date=date, sender=None, reciever=customer, item=Ship)
 
     
 class FishSpecies(models.Model):
@@ -81,22 +139,7 @@ class FishSpecies(models.Model):
         return f"Fish Stock: {self.population}, Value: ${self.value}"
 
 
-class InGameTime(models.Model):
-    start_time = models.FloatField(default=0)
-    game_start_time = models.FloatField(default=0)
-    time_scale = models.FloatField(default=365.0)
-    
-        
-    def resetTime(self):
-        self.start_time = time.time()
-        self.save()
 
-    def getTime(self):
-        current_time = time.time()
-        return self.game_start_time + (current_time - self.start_time)*self.time_scale
-    
-    def formatTime(self, value):
-        return datetime.fromtimestamp(int(value)).strftime('%Y-%m-%d %I:%M%p')
 
 class Invoice(models.Model):
     revenues = models.JSONField(default=dict, encoder=DjangoJSONEncoder)

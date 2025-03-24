@@ -1,0 +1,41 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+<body>
+        <h1>{{ group.name }}</h1>
+        <p>Created by: {{ group.owner.username }}</p>
+
+        <h2>Members</h2>
+        <ul class="list-group">
+            {% for member in group.members.all %}
+                <li class="list-group-item">{{ member.username }}</li>
+            {% endfor %}
+        </ul>
+
+        {% if request.user == group.owner %}
+            <h2>Invite User</h2>
+            <form method="post" class="mb-3">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.recipient.label_tag }}
+                    {{ form.recipient }}
+                </div>
+                <button type="submit" name="send_invite" class="btn btn-primary">Send Invite</button>
+            </form>
+
+            <h2>Pending Invitations</h2>
+            <ul class="list-group">
+                {% for invitation in pending_invitations %}
+                    <li class="list-group-item">
+                        Invitation to {{ invitation.recipient.username }} ({{ invitation.status }})
+                    </li>
+                {% endfor %}
+            </ul>
+            <form action="{% url 'delete_group' group.id%}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="buy-button" style="background-color:red; width:auto;" onclick="return confirm('Are you sure you want to delete this organization? This change cannot be undone.')">
+                    Delete Organization
+                </button>
+            </form>
+        {% endif %}
+</body>
+{% endblock %}

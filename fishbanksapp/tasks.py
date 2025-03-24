@@ -22,15 +22,16 @@ def update_population():
 @shared_task
 def return_ships():
     t = InGameTime.objects.first()
-    current_time = t.formatTime(t.getTime())
-
+    current_time = t.getFormattedTime()
 
     for user in User.objects.all():
         items = {}
         costs = {}
         ships = Ship.objects.all().filter(owner=user)
+        none_assigned = True
         for ship in ships:
             if ship.harbor != None:
+                none_assigned = False
                 fish_type = FishSpecies.objects.get(harbor=ship.harbor)
                 total_fish = float(ship.fishing_rate) * float(fish_type.population)
 
@@ -46,10 +47,10 @@ def return_ships():
                 if Gas.objects.first() != None:
                     costs[f'gas for {ship.nickname}'] = ship.fishing_capacity * Gas.objects.first().price
                 costs[f'worker salaries for {ship.nickname}'] = 3 * ship.fishing_capacity
-
-        invoice = Invoice.objects.create(user=user, revenues=items, costs=costs, date=current_time)
-        user.profile.balance += invoice.getProfit()
-        user.save()
+        if not none_assigned:
+            invoice = Invoice.objects.create(user=user, revenues=items, costs=costs, date=current_time)
+            user.profile.balance += invoice.getProfit()
+            user.save()
 
 def update_market_value():
     for species in FishSpecies:
