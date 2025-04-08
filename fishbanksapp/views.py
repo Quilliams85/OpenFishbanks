@@ -1,9 +1,10 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import Ship, FishSpecies, InGameTime, Invoice, Harbor, ManufacturerShip, Group, Invitation
+from .models import Ship, FishSpecies, InGameTime, Invoice, Harbor, ManufacturerShip, Group, Invitation, Transaction, AuctionListing
 from django.db.models import Count
 from django.contrib.auth.models import User
-from .forms import ShipForm, ShipUpdateForm, GroupForm, InviteUserForm
+from .forms import ShipForm, ShipUpdateForm, GroupForm, InviteUserForm, AuctionListingForm, BidForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 import plotly.express as px
 import pandas as pd
 from django.http import JsonResponse
@@ -26,8 +27,16 @@ def home(request):
 
 
 def shop(request):
+    listings = AuctionListing.objects.filter(status='pending')
     ships = ManufacturerShip.objects.all()
-    return render(request, 'fishbanksapp/shop.html', {'ships': ships})
+
+    bid_forms = {listing.id: BidForm() for listing in listings}
+
+    return render(request, 'fishbanksapp/shop.html', {
+        'ships': ships,
+        'listings': listings,
+        'bid_forms': bid_forms
+    })
 
 def purchase_ship(request, ship_id):
     ship = get_object_or_404(ManufacturerShip, id=ship_id)
@@ -54,13 +63,11 @@ def myprofile(request):
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
     profile = user.profile
-    is_owner = (request.user == user) 
-    if is_owner :
-        return redirect('/myprofile/')
+    groups = Group.objects.filter(members=user)
     context = {
         'profile_user': user,
         'profile': profile,
-        'is_owner': is_owner,
+        'groups':groups
     }
     return render(request, 'fishbanksapp/user_profile.html', context)
 
@@ -216,12 +223,16 @@ def user_inventory(request):
             locations[ship.harbor] = [ship]
         else:
             locations[ship.harbor].append(ship)
-        
+    
+    listings = AuctionListing.objects.filter(listing_owner=user)
     ships = Ship.objects.filter(owner=user)
-    return render(request, 'fishbanksapp/user_inventory.html', {'ships':ships, 'locations':locations})
+    return render(request, 'fishbanksapp/user_inventory.html', {'ships':ships, 'locations':locations, 'listings':listings})
 
 def user_transactions(request):
-    return render(request, 'fishbanksapp/user_transactions.html')
+    user = request.user
+    transactions = Transaction.objects.filter(reciever=user)
+    transactions = list(transactions)[::-1]
+    return render(request, 'fishbanksapp/user_transactions.html', {'transactions':transactions})
 
 
 def create_group(request):
@@ -310,3 +321,46 @@ def delete_group(request, group_id):
     group = Group.objects.get(id=group_id)
     group.delete()
     return redirect('groups')
+
+def create_listing(request, ship_id):
+    ship = Ship.objects.get(id=ship_id)
+    user = request.user
+    if request.method == 'POST':
+        form = AuctionListingForm(request.POST)
+        if form.is_valid():
+            listing = form.save(commit=False)
+            listing.ship = ship
+            listing.listing_owner = user
+            ship.owner = None
+            ship.save()
+            listing.save()
+            return redirect('/shop')
+    else:
+        form = AuctionListingForm()
+    return render(request, 'fishbanksapp/create_listing.html', {'form': form, 'ship':ship})
+
+def buy_now(request, auction_id):
+    listing = AuctionListing.objects.get(id=auction_id)
+    listing.current_bidder = request.user
+    listing.current_bid = listing.buy_now_price
+    listing.save()
+    listing.sellShip()
+    return redirect('inventory')
+
+def place_bid(request, auction_id):
+    auction = get_object_or_404(AuctionListing, id=auction_id)
+    
+    if request.method == "POST":
+        form = BidForm(request.POST)
+        if form.is_valid():
+            bid_amount = form.cleaned_data["bid_amount"]
+            
+            if bid_amount > auction.current_bid:  # Ensure it's a higher bid
+                auction.current_bid = bid_amount
+                auction.current_bidder = request.user
+                auction.save()
+                messages.success(request, "Your bid was placed successfully!")
+            else:
+                messages.error(request, "Your bid must be higher than the current bid.")
+
+    return redirect("shop")  # Redirect to auction detail page

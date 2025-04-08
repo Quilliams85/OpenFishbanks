@@ -337,3 +337,44 @@ button:hover {
     border-radius: 4px;
     background-color: #EEEEEE;
 }
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    color:black;
+    display: none;
+    position: absolute;
+    right: 0; /* Aligns the right edge of the dropdown with the button */
+    top: 100%; /* Places dropdown directly below */
+    background-color: white;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    border-radius: 8px;
+}
+
+
+.dropdown-content form {
+    margin: 0;
+    padding: 0;
+}
+
+.dropdown-content button {
+    width: 100%;
+    border: none;
+    background: none;
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dropdown-content button:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}

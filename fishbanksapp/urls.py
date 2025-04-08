@@ -26,5 +26,8 @@ urlpatterns = [
     path('invitation/accept/<int:invitation_id>/', views.accept_invitation, name='accept_invitation'),
     path('invitation/decline/<int:invitation_id>/', views.decline_invitation, name='decline_invitation'),
     path('group/<int:group_id>/leave', views.leave_group, name='leave_group'),
-    path('group/<int:group_id>/delete', views.delete_group, name='delete_group')
+    path('group/<int:group_id>/delete', views.delete_group, name='delete_group'),
+    path('create_listing/<str:ship_id>', views.create_listing, name='create_listing'),
+    path('buy_now/<int:auction_id>', views.buy_now, name='buy_now'),
+    path('bid/<int:auction_id>/', views.place_bid, name='place_bid'),
 ]

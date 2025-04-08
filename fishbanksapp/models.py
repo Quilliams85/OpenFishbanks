@@ -1,9 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.serializers.json import DjangoJSONEncoder
 from simple_history.models import HistoricalRecords
+from django.utils.timezone import now
 import time
 from datetime import datetime
 
@@ -59,12 +62,25 @@ def save_profile(sender, instance, **kwargs):
 
 
 class Transaction(models.Model):
+    class TransactionType(models.TextChoices):
+        PLAYER_TO_PLAYER = "P2P", "Player to Player"
+        STORE_TO_PLAYER = "S2P", "Store to Player"
+        PLAYER_TO_STORE = "P2S", "Player to Store"
+        OTHER = "OTH", "Other"
     sender = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='transaction_sender')
-    reciever = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='transaction_reciever')
-    date = models.TimeField(default=None)
-    type = models.CharField(max_length=200, null=True, default=None)
+    reciever = models.ForeignKey(User, related_name="received_transactions", on_delete=models.CASCADE, null=True, blank=True)
+    date = models.CharField(default=None, max_length=100)
+
+    transaction_type = models.CharField(
+        max_length=3,
+        choices=TransactionType.choices,
+        default=TransactionType.PLAYER_TO_PLAYER
+    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, default=None)
+    object_id = models.PositiveIntegerField(default=None)
+    object = GenericForeignKey('content_type', 'object_id')
     def __str__(self):
-        return f"{self.sender} sent item to {self.reciever} on {self.date}"
+        return f"{self.sender} sent {self.object} to {self.reciever} on {self.date}. This transaction is type {self.transaction_type}"
     
 class InGameTime(models.Model):
     start_time = models.FloatField(default=0)
@@ -107,6 +123,7 @@ class Ship(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     damage = models.FloatField(default=0)
     harbor = models.ForeignKey(Harbor, on_delete=models.SET_NULL, null=True, blank=True, related_name='ships_temp')  # New ForeignKey
+    
 
     def __str__(self):
         return self.name
@@ -119,9 +136,14 @@ class ManufacturerShip(models.Model):
     description = models.TextField(blank=True, null=True)
 
     def sellShip(self, customer):
-        Ship.objects.create(name=self.name, fishing_capacity=self.fishing_capacity, fishing_rate=self.fishing_rate, description=self.description, owner=customer, nickname=self.name, cost=self.base_cost)
+        ship = Ship.objects.create(name=self.name, fishing_capacity=self.fishing_capacity, fishing_rate=self.fishing_rate, description=self.description, owner=customer, nickname=self.name, cost=self.base_cost)
         date = InGameTime.objects.first().getFormattedTime()
-        Transaction.objects.create(type='P2P Ship', date=date, sender=None, reciever=customer, item=Ship)
+        Transaction.objects.create(sender=None, reciever=customer,
+            transaction_type=Transaction.TransactionType.STORE_TO_PLAYER,
+            content_type=ContentType.objects.get_for_model(Ship),
+            object_id=ship.id,
+            date=date
+        )
 
     
 class FishSpecies(models.Model):
@@ -161,3 +183,56 @@ class Gas(models.Model):
 
     def __str__(self):
         return f"Gas price is {self.price} per fishing cycle per kg of fishing capacity on ship"
+    
+class AuctionListing(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('sold', 'Sold'),
+        ('expired', 'Expired'),
+    ]
+    history = HistoricalRecords()
+    end_time = models.DateTimeField(null=True, blank=True)
+    ship = models.ForeignKey(Ship, on_delete=models.CASCADE, related_name='listing_ship', null=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    buy_now_price = models.FloatField(default=0)
+    current_bid = models.FloatField(default=0)
+    current_bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='current_bidder', null=True)
+    starting_bid = models.FloatField(default=0)
+    details = models.TextField(null=True)
+    listing_owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_listing', null=True)
+
+    def sellShip(self):
+        """Finalize the sale when the auction ends."""
+        if self.current_bidder:
+            date = InGameTime.objects.first().getFormattedTime()
+            self.current_bidder.profile.balance -= self.current_bid
+            self.current_bidder.profile.save()
+            self.listing_owner.profile.balance += self.current_bid
+            self.listing_owner.profile.save()
+            
+            Transaction.objects.create(
+                sender=self.listing_owner,
+                reciever=self.current_bidder,
+                transaction_type=Transaction.TransactionType.PLAYER_TO_PLAYER,
+                content_type=ContentType.objects.get_for_model(Ship),
+                object_id=self.ship.id,
+                date=date
+            )
+            
+            self.ship.owner = self.current_bidder
+            self.ship.save()
+            self.status = 'sold'
+        else:
+            self.status = 'expired'       
+        self.save()
+
+    @classmethod
+    def check_ended_auctions(cls):
+        """Find auctions that have ended and process them."""
+        ended_auctions = cls.objects.filter(end_time__lte=now(), status='pending')
+        for auction in ended_auctions:
+            auction.sellShip()
+    
+    def enter_bid(self, bid, customer):
+        self.current_bidder = customer
+        self.current_bid = bid

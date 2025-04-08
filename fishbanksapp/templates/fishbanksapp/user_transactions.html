@@ -1,4 +1,28 @@
 {% extends 'fishbanksapp/base.html' %}
 {% block content %}
-
+<body>
+        <h2>Invoices</h2>
+        <div class="invoices-header">
+            <h3>Item</h3>
+            <h3>To</h3>
+            <h3>From</h3>
+            <h3>Type</h3>
+            <h3>Date</h3>
+            
+        </div>
+        <hr/>
+            {% for item in transactions%}
+                <div class="invoice-card">
+                    <p>{{item.object}}</p>
+                    <p><a href="{% url 'user_profile' username=item.reciever.username %}">{{item.reciever}}</a></p>
+                    {% if item.sender == None %}
+                    <p>Shop</p>
+                    {% else %}
+                    <p><a href="{% url 'user_profile' username=item.sender.username %}">{{item.sender}}</a></p>
+                    {% endif %}
+                    <p>{{item.transaction_type}}</p>
+                    <p>{{item.date}}</p>
+                </div>
+            {% endfor %}
+</body>
 {% endblock %}

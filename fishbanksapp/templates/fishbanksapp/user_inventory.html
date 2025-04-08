@@ -2,6 +2,9 @@
 {% block content %}
 <h1>{{user.username}}'s Ships</h1>
 <div class="dashboard">
+    {% if not locations %}
+    <i>You currently own no ships</i>
+    {% endif %}
     {% for loc in locations %}
     <div class="card" style="grid-column: span 3;">
         {% if loc.name == None %}
@@ -22,6 +25,11 @@
                         {% csrf_token %}
                         <button type="submit" class="buy-button">Modify Ship</button>
                     </form>
+                    <p></p>
+                    <form action="{% url 'create_listing' ship.id%}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="buy-button">Auction Ship</button>
+                    </form>
                 </div>
                 {% endif %}
             {% endfor %}
@@ -29,4 +37,21 @@
     </div>
     {% endfor %}
 </div>
+{% if listings %}
+<h1>Ships on Auction</h1>
+<div class="ship-container">
+    {% for listing in listings %}
+    <div class="ship-card">
+        <h2>{{ listing.ship.name }}</h2>
+        <p>Listing created by: {{ listing.listing_owner }}</p>
+        <p>Status: {{ listing.status }}</p>
+        <p>Buy Now: {{ listing.buy_now_price }}</p>
+        <p>Current Bid: {{ listing.current_bid }}</p>
+
+
+        <p>{{ listing.details }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 {% endblock %}

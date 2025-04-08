@@ -1,4 +1,5 @@
 {% extends 'fishbanksapp/base.html' %}
+{% load auction_tags %}
 {% load humanize %}
 {% block content %}
 <head>
@@ -8,9 +9,9 @@
 </head>
 <body>
     <h1>Purchase From Manufacturers</h1>
-    <div class="ship-container">
+    <div class="dashboard">
         {% for ship in ships %}
-        <div class="ship-card">
+        <div class="card">
             <h2>{{ ship.name }}</h2>
             <p><strong>Price:</strong> ${{ ship.base_cost|intcomma }}</p>
             <p><strong>Maximum Fishing Rate:</strong> {{ ship.fishing_rate|intcomma }} fish/turn</p>
@@ -29,17 +30,46 @@
         {% endfor %}
     </div>
 
-    <script>
-        function showAllShips() {
-            document.querySelectorAll('.ship-card.hidden').forEach(ship => {
-                ship.classList.remove('hidden');
-            });
-            document.getElementById('showAllButton').style.display = 'none';
-        }
-    </script>
 
-    <h1>Purchase Used</h1>
     <h1>Ships on Auction</h1>
+    <div class="dashboard">
+        {% for listing in listings %}
+        <div class="card">
+            <h2>{{ listing.ship.name }}</h2>
+            <p><strong>Time remaining: </strong>{{ listing.end_time|format_time_remaining }}</p>
+            <p><strong>Listing created by:</strong> {{ listing.listing_owner }}</p>
+            <p><strong>Status:</strong> {{ listing.status }}</p>
+            <p><strong>Description:</strong> {{ listing.details }}</p>
+            <p><strong>Buy Now:</strong> {{ listing.buy_now_price }}</p>
+
+            <form action="{% url 'buy_now' listing.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="buy-button" onclick="return confirm('Are you sure you want to purchase this ship?');">
+                    Buy Now
+                </button>
+            </form>
+
+            <!-- BID FORM -->
+            <p></p>
+            {% if not listing.current_bidder %}
+            <p><i>No Bids have been placed</i></p>
+            {% else %}
+            <p><strong>Current Bid:</strong> {{ listing.current_bid }} (submitted by {{listing.current_bidder}})</p>
+            {% endif %}
+            <p><strong>Enter Bid:</strong></p>
+            <form method="post" action="{% url 'place_bid' listing.id %}">
+                {% csrf_token %}
+                {% with bid_form=bid_forms|dict_get:listing.id %}
+                    {{ bid_form.bid_amount }}
+                {% endwith %}
+                <button type="submit" class="buy-button">Place Bid</button>
+            </form>
+        </div>
+        {% endfor %}
+
+    </div>
 </body>
+
+
 
 {% endblock %}
