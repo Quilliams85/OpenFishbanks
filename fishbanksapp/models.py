@@ -208,7 +208,7 @@ class AuctionListing(models.Model):
             self.current_bidder.profile.balance -= self.current_bid
             self.current_bidder.profile.save()
             self.listing_owner.profile.balance += self.current_bid
-            self.listing_owner.profile.save()
+            self.listing_owner.save()
             
             Transaction.objects.create(
                 sender=self.listing_owner,
@@ -234,5 +234,6 @@ class AuctionListing(models.Model):
             auction.sellShip()
     
     def enter_bid(self, bid, customer):
-        self.current_bidder = customer
-        self.current_bid = bid
+        if (self.listing_owner != customer) and (self.end_time < now()):
+            self.current_bidder = customer
+            self.current_bid = bid

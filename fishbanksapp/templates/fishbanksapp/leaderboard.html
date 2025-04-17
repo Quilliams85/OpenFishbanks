@@ -1,4 +1,5 @@
 {% extends 'fishbanksapp/base.html' %}
+{% load auction_tags %}
 {% load humanize %}
 {% block content %}
 <head>
@@ -62,18 +63,19 @@
 <body>
     <h1>Top Fisheries</h1>
     <ol>
-        {% for key, value in ordered_users.items %}
+        {% for user in users %}
             <li>
-                <a href="{% url 'user_profile' username=key %}">
-                    {{ key }}
+                {% if user_groups|hash:user%}
+                <a href="{% url 'user_profile' username=user.username %}">
+                    {{ user.username}}[{{user_groups|hash:user}}]
                 </a>
-                {% for org in groups %}
-                {% if user in org.members.all %}
-                <p>{{org.name}}</p>
+                {% else %}
+                <a href="{% url 'user_profile' username=user.username %}">
+                    {{ user.username}}
+                </a>
                 {% endif %}
-                {% endfor %}
-                <p>Current Balance: ${{ value|intcomma }}</p>
-                <p>Joined on {{ user.date_joined|date:"F j, Y" }}</p>
+                <p><strong>Balance: </strong>{{user.profile.balance}}</p>
+                <p><strong>Joined: </strong>{{user.date_joined}}</p>
             </li>
         {% endfor %}
     </ol>

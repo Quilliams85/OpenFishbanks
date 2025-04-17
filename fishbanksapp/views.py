@@ -27,7 +27,7 @@ def home(request):
 
 
 def shop(request):
-    listings = AuctionListing.objects.filter(status='pending')
+    listings = AuctionListing.objects.filter(status='pending').exclude(listing_owner=request.user)
     ships = ManufacturerShip.objects.all()
 
     bid_forms = {listing.id: BidForm() for listing in listings}
@@ -73,16 +73,21 @@ def user_profile(request, username):
 
 def leaderboard(request):
     users = User.objects.all()  # Fetch all users
-    groups = Group.objects.all()
-    ordered_users = {}
-    for i in users:
-        ordered_users[str(i.username)] = i.profile.balance
 
-    ordered_users = dict(sorted(ordered_users.items(), key=lambda item: item[1], reverse=True))
+    sorted_users = sorted(users, key=lambda user: user.profile.balance, reverse=True)
+    user_groups = {}
+
+    for user in sorted_users: # get groups for user and assign in dict
+        groups = Group.objects.filter(members=user)
+        if not groups:
+            user_groups[user] = None
+        else:
+            for group in groups:      
+                user_groups[user] = group
+
     context = {
-        'users': users,
-        'ordered_users': ordered_users,
-        'groups':groups
+        'users': sorted_users,
+        'user_groups':user_groups
     }
     return render(request, 'fishbanksapp/leaderboard.html', context)
 
@@ -224,13 +229,14 @@ def user_inventory(request):
         else:
             locations[ship.harbor].append(ship)
     
-    listings = AuctionListing.objects.filter(listing_owner=user)
+    listings = AuctionListing.objects.filter(listing_owner=user, status='pending')
     ships = Ship.objects.filter(owner=user)
     return render(request, 'fishbanksapp/user_inventory.html', {'ships':ships, 'locations':locations, 'listings':listings})
 
 def user_transactions(request):
     user = request.user
     transactions = Transaction.objects.filter(reciever=user)
+    transactions |= Transaction.objects.filter(sender=user)
     transactions = list(transactions)[::-1]
     return render(request, 'fishbanksapp/user_transactions.html', {'transactions':transactions})
 
@@ -364,3 +370,18 @@ def place_bid(request, auction_id):
                 messages.error(request, "Your bid must be higher than the current bid.")
 
     return redirect("shop")  # Redirect to auction detail page
+
+def harbors(request):
+    harbors = Harbor.objects.all()
+    return render(request, 'fishbanksapp/harbors.html', {'harbors': harbors})
+
+def harbor_detail(request, harbor_id):
+    harbor = Harbor.objects.get(id=harbor_id)
+    ships = Ship.objects.filter(harbor=harbor)
+    species = FishSpecies.objects.filter(harbor=harbor)
+    current_population = len(ships)
+    return render(request, 'fishbanksapp/harbor_detail.html', {'harbor': harbor, 'current_population': current_population, 'species':species})
+
+def fish_market(request):
+    species = FishSpecies.objects.all()
+    return render(request, 'fishbanksapp/fish_market.html', {'species': species})

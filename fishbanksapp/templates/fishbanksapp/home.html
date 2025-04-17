@@ -11,31 +11,6 @@
     <p> <strong>You are not logged in, sign in or create an account <a href="login">here</a></strong></p>
     {% endif %}
 
-    <h1>Harbors</h1>
-    <div class="harbor-container">
-        {% for harbor in harbors %}
-        <div class="ship-card {% if forloop.counter > 3 %}hidden{% endif %}">
-            <h2>{{ harbor.name }}</h2>
-            <p><strong>Fee:</strong> {{ harbor.storage_fee }}</p>
-            <p>{{ harbor.description }}</p>
-        </div>
-        {% endfor %}
-    </div>
-
-    {% if harbors|length > 3 %}
-    <div style="text-align: center; margin-top: 20px;">
-        <button id="showAllButton" class="visit-button" onclick="showAllHarbors()">Show All</button>
-    </div>
-    {% endif %}
-
-    <script>
-        function showAllHarbors() {
-            document.querySelectorAll('.harbor-card.hidden').forEach(harbor => {
-                harbor.classList.remove('hidden');
-            });
-            document.getElementById('showAllButton').style.display = 'none';
-        }
-    </script>
 </body>
 
 {% endblock %}

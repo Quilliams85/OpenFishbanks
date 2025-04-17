@@ -1,0 +1,19 @@
+{% extends 'fishbanksapp/base.html' %}
+{% load auction_tags %}
+{% load humanize %}
+{% block content %}
+<body>
+    <h1>{{ harbor.name }}</h1>
+        <p><strong>Number of Ships currently docked here:</strong> {{ current_population }}</p>
+        <p><strong>Fee:</strong> {{ harbor.storage_fee }}</p>
+        <h3>Description</h3>
+        <p>{{ harbor.description }}</p>
+        <h3>Native Fish Species:</h3>
+        <ul>
+            {% for fish in species %}
+            <li>{{ fish.name }}</li>
+            {% endfor %}
+        </ul>
+
+</body>
+{% endblock %}

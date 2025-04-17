@@ -38,3 +38,7 @@ def format_time_remaining(end_time):
 @register.filter
 def dict_get(d, key):
     return d.get(key)
+
+@register.filter
+def hash(h, key):
+    return h[key]

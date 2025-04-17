@@ -8,33 +8,14 @@
     <title>Shop</title>
 </head>
 <body>
-    <h1>Purchase From Manufacturers</h1>
-    <div class="dashboard">
-        {% for ship in ships %}
-        <div class="card">
-            <h2>{{ ship.name }}</h2>
-            <p><strong>Price:</strong> ${{ ship.base_cost|intcomma }}</p>
-            <p><strong>Maximum Fishing Rate:</strong> {{ ship.fishing_rate|intcomma }} fish/turn</p>
-            <p><strong>Maximum Capacity:</strong> {{ ship.fishing_capacity|intcomma }} kg</p>
-            <p><strong>Ships in Stock:</strong> 
-                <span class="{% if ship.stock <= 2 %}stock-low{% endif %}">{{ ship.stock }}</span>
-            </p>
-            <p>{{ ship.description }}</p>
-            <form action="{% url 'purchase_ship' ship.id %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="buy-button" {% if ship.stock <= 0 %}disabled{% endif %} onclick="return confirm('Are you sure you want to purchase this ship?');">
-                    {% if ship.stock <= 0 %}Out of Stock{% else %}Buy{% endif %}
-                </button>
-            </form>
-        </div>
-        {% endfor %}
-    </div>
-
-
     <h1>Ships on Auction</h1>
+    {% if not listings %}
+    <i>No current listings</i>
+    {% endif %}
     <div class="dashboard">
         {% for listing in listings %}
-        <div class="card">
+        {% if listing.end_time|format_time_remaining != "Auction ended" %}
+        <div class="card" style="width: fit-content;">
             <h2>{{ listing.ship.name }}</h2>
             <p><strong>Time remaining: </strong>{{ listing.end_time|format_time_remaining }}</p>
             <p><strong>Listing created by:</strong> {{ listing.listing_owner }}</p>
@@ -65,9 +46,34 @@
                 <button type="submit" class="buy-button">Place Bid</button>
             </form>
         </div>
+        {% endif %}
         {% endfor %}
 
     </div>
+    <h1>Purchase From Manufacturers</h1>
+    <div class="dashboard">
+        {% for ship in ships %}
+        <div class="card">
+            <h2>{{ ship.name }}</h2>
+            <p><strong>Price:</strong> ${{ ship.base_cost|intcomma }}</p>
+            <p><strong>Maximum Fishing Rate:</strong> {{ ship.fishing_rate|intcomma }} fish/turn</p>
+            <p><strong>Maximum Capacity:</strong> {{ ship.fishing_capacity|intcomma }} kg</p>
+            <p><strong>Ships in Stock:</strong> 
+                <span class="{% if ship.stock <= 2 %}stock-low{% endif %}">{{ ship.stock }}</span>
+            </p>
+            <p>{{ ship.description }}</p>
+            <form action="{% url 'purchase_ship' ship.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="buy-button" {% if ship.stock <= 0 %}disabled{% endif %} onclick="return confirm('Are you sure you want to purchase this ship?');">
+                    {% if ship.stock <= 0 %}Out of Stock{% else %}Buy{% endif %}
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    
 </body>
 
 

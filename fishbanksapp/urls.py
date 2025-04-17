@@ -30,4 +30,7 @@ urlpatterns = [
     path('create_listing/<str:ship_id>', views.create_listing, name='create_listing'),
     path('buy_now/<int:auction_id>', views.buy_now, name='buy_now'),
     path('bid/<int:auction_id>/', views.place_bid, name='place_bid'),
+    path('harbors/', views.harbors, name='harbors'),
+    path('harbors/<int:harbor_id>', views.harbor_detail, name='harbor_detail'),
+    path('market/', views.fish_market, name='fish_market')
 ]

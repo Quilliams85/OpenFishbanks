@@ -1,0 +1,22 @@
+{% extends 'fishbanksapp/base.html' %}
+{% load auction_tags %}
+{% load humanize %}
+{% block content %}
+<h1>Fish Market</h1>
+<div class="container">
+    {% for fish in species %}
+    <div class="card">
+        <h2>{{ fish.name }}</h2>
+        <p><strong>Current market value:</strong> ${{ fish.value }}</p>
+        <p><strong>Found in: </strong>{{ fish.harbor }}</p>
+        <form action="{% url 'harbor_detail' fish.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy-button">
+                View Details
+            </button>
+        </form>
+
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

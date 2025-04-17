@@ -143,6 +143,7 @@ h2 {
 }
 .buy-button {
     background-color: #76ABAE;
+    width: 150px;
     color: white;
     padding: 10px 20px;
     border: none;
