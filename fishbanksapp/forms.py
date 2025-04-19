@@ -1,5 +1,5 @@
 from django import forms
-from .models import Ship, Group, AuctionListing
+from .models import Ship, Group, AuctionListing, TradeRequest
 from django.contrib.auth.models import User
 
 class ShipForm(forms.ModelForm):
@@ -41,3 +41,14 @@ class AuctionListingForm(forms.ModelForm):
 
 class BidForm(forms.Form):
     bid_amount = forms.DecimalField(max_digits=10, decimal_places=2, min_value=0.01)
+
+
+class TradeRequestForm(forms.ModelForm):
+    class Meta:
+        model = TradeRequest
+        fields = ['recipient', 'offered_ships', 'money_offered', 'requested_ships', 'money_requested']
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+        self.fields['offered_ships'].queryset = Ship.objects.filter(owner=user)

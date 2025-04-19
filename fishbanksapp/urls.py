@@ -32,5 +32,8 @@ urlpatterns = [
     path('bid/<int:auction_id>/', views.place_bid, name='place_bid'),
     path('harbors/', views.harbors, name='harbors'),
     path('harbors/<int:harbor_id>', views.harbor_detail, name='harbor_detail'),
-    path('market/', views.fish_market, name='fish_market')
+    path('market/', views.fish_market, name='fish_market'),
+    path('trade/create/<int:user_id>', views.create_trade_request, name='create_trade'),
+    path('trade/', views.view_trades, name='view_trades'),
+    path('trade/respond/<int:trade_id>/<str:response>/', views.respond_to_trade, name='respond_to_trade'),
 ]

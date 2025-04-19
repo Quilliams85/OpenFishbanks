@@ -76,8 +76,8 @@ class Transaction(models.Model):
         choices=TransactionType.choices,
         default=TransactionType.PLAYER_TO_PLAYER
     )
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, default=None)
-    object_id = models.PositiveIntegerField(default=None)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, default=None, null=True)
+    object_id = models.PositiveIntegerField(default=None, null=True)
     object = GenericForeignKey('content_type', 'object_id')
     def __str__(self):
         return f"{self.sender} sent {self.object} to {self.reciever} on {self.date}. This transaction is type {self.transaction_type}"
@@ -237,3 +237,25 @@ class AuctionListing(models.Model):
         if (self.listing_owner != customer) and (self.end_time < now()):
             self.current_bidder = customer
             self.current_bid = bid
+
+class TradeRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_trades')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_trades')
+    
+    offered_ships = models.ManyToManyField(Ship, related_name='offered_in_trades', blank=True)
+    requested_ships = models.ManyToManyField(Ship, related_name='requested_in_trades', blank=True)
+    
+    money_offered = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    money_requested = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Trade from {self.sender} to {self.recipient} ({self.status})"

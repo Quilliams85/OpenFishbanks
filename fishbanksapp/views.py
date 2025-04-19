@@ -1,8 +1,8 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import Ship, FishSpecies, InGameTime, Invoice, Harbor, ManufacturerShip, Group, Invitation, Transaction, AuctionListing
+from .models import Ship, FishSpecies, InGameTime, Invoice, Harbor, ManufacturerShip, Group, Invitation, Transaction, AuctionListing, TradeRequest
 from django.db.models import Count
 from django.contrib.auth.models import User
-from .forms import ShipForm, ShipUpdateForm, GroupForm, InviteUserForm, AuctionListingForm, BidForm
+from .forms import ShipForm, ShipUpdateForm, GroupForm, InviteUserForm, AuctionListingForm, BidForm, TradeRequestForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import plotly.express as px
@@ -38,6 +38,7 @@ def shop(request):
         'bid_forms': bid_forms
     })
 
+@login_required
 def purchase_ship(request, ship_id):
     ship = get_object_or_404(ManufacturerShip, id=ship_id)
     user = request.user
@@ -52,6 +53,7 @@ def purchase_ship(request, ship_id):
         return render(request, 'fishbanksapp/unsuccessful_purchase.html', {'item': ship.name})
     
 def myprofile(request):
+    return redirect('user_profile', username=request.user.username)
     user = request.user        
     balance = user.profile.balance
     context = {
@@ -134,7 +136,8 @@ def config(request):
         return render(request, 'fishbanksapp/config.html', {'ships_and_forms': ships_and_forms, 'history':fish_history, 'chart_html': chart_html})
     else:
         return HttpResponse('NO ACCESS')
-    
+
+@login_required    
 def invoice(request, invoice_id):
     user = request.user
     invoice = get_object_or_404(Invoice, id=invoice_id)
@@ -143,6 +146,7 @@ def invoice(request, invoice_id):
         return None
     return render(request, 'fishbanksapp/invoice.html', {'invoice':invoice, 'profit':profits, 'num':invoice_id})
 
+@login_required
 def modify(request, ship_id):
     user = request.user
     ship = Ship.objects.get(id=ship_id)
@@ -168,6 +172,8 @@ def modify(request, ship_id):
     }
     return render(request, 'fishbanksapp/modify.html', context)
 
+
+@login_required
 def invoice_list(request):
     user = request.user
 
@@ -176,6 +182,7 @@ def invoice_list(request):
 
     return render(request, 'fishbanksapp/invoice_list.html', {'invoices':invoices})
 
+@login_required
 def user_finances(request):
     user = request.user
         
@@ -220,6 +227,7 @@ def user_finances(request):
 def about(request):
     return render(request, 'fishbanksapp/about.html')
 
+@login_required
 def user_inventory(request):
     user = request.user
     locations= {}
@@ -233,6 +241,7 @@ def user_inventory(request):
     ships = Ship.objects.filter(owner=user)
     return render(request, 'fishbanksapp/user_inventory.html', {'ships':ships, 'locations':locations, 'listings':listings})
 
+@login_required
 def user_transactions(request):
     user = request.user
     transactions = Transaction.objects.filter(reciever=user)
@@ -240,7 +249,7 @@ def user_transactions(request):
     transactions = list(transactions)[::-1]
     return render(request, 'fishbanksapp/user_transactions.html', {'transactions':transactions})
 
-
+@login_required
 def create_group(request):
     if request.method == 'POST':
         form = GroupForm(request.POST)
@@ -254,6 +263,7 @@ def create_group(request):
         form = GroupForm()
     return render(request, 'fishbanksapp/create_group.html', {'form': form})
 
+@login_required
 def add_member(request, group_id):
     group = Group.objects.get(id=group_id)
     if request.user == group.creator:  # Only the creator can add members
@@ -264,6 +274,7 @@ def add_member(request, group_id):
             return redirect('group_detail', group.id)
     return redirect('group_detail', group.id)
 
+@login_required
 def group_detail(request, group_id):
 
     group = get_object_or_404(Group, id=group_id)
@@ -293,6 +304,7 @@ def group_detail(request, group_id):
         'pending_invitations': pending_invitations,
     })
 
+@login_required
 def user_groups(request):
     user = request.user
     groups = Group.objects.filter(members=user)
@@ -323,11 +335,13 @@ def leave_group(request, group_id):
     group.members.remove(user)
     return redirect('groups')
 
+@login_required
 def delete_group(request, group_id):
     group = Group.objects.get(id=group_id)
     group.delete()
     return redirect('groups')
 
+@login_required
 def create_listing(request, ship_id):
     ship = Ship.objects.get(id=ship_id)
     user = request.user
@@ -345,6 +359,7 @@ def create_listing(request, ship_id):
         form = AuctionListingForm()
     return render(request, 'fishbanksapp/create_listing.html', {'form': form, 'ship':ship})
 
+@login_required
 def buy_now(request, auction_id):
     listing = AuctionListing.objects.get(id=auction_id)
     listing.current_bidder = request.user
@@ -353,6 +368,7 @@ def buy_now(request, auction_id):
     listing.sellShip()
     return redirect('inventory')
 
+@login_required
 def place_bid(request, auction_id):
     auction = get_object_or_404(AuctionListing, id=auction_id)
     
@@ -371,10 +387,13 @@ def place_bid(request, auction_id):
 
     return redirect("shop")  # Redirect to auction detail page
 
+@login_required
+
 def harbors(request):
     harbors = Harbor.objects.all()
     return render(request, 'fishbanksapp/harbors.html', {'harbors': harbors})
 
+@login_required
 def harbor_detail(request, harbor_id):
     harbor = Harbor.objects.get(id=harbor_id)
     ships = Ship.objects.filter(harbor=harbor)
@@ -382,6 +401,77 @@ def harbor_detail(request, harbor_id):
     current_population = len(ships)
     return render(request, 'fishbanksapp/harbor_detail.html', {'harbor': harbor, 'current_population': current_population, 'species':species})
 
+@login_required
 def fish_market(request):
     species = FishSpecies.objects.all()
     return render(request, 'fishbanksapp/fish_market.html', {'species': species})
+
+
+@login_required
+def create_trade_request(request, user_id):
+    recipient = User.objects.get(id=user_id)
+    if request.method == 'POST':
+        form = TradeRequestForm(request.POST, user=request.user)
+        if form.is_valid():
+            trade = form.save(commit=False)
+            trade.sender = request.user
+            trade.save()
+            form.save_m2m()
+            messages.success(request, 'Trade request sent!')
+            return redirect('home')
+    else:
+        form = TradeRequestForm(user=request.user)
+        form.fields['requested_ships'].queryset = Ship.objects.filter(owner=recipient)
+        form.fields['recipient'].initial = recipient
+    return render(request, 'fishbanksapp/create_trade.html', {'form': form})
+
+@login_required
+def view_trades(request):
+    incoming_pending = request.user.received_trades.filter(status='pending')
+    outgoing_pending = request.user.sent_trades.filter(status='pending')
+    incoming_past = request.user.received_trades.exclude(status='pending')
+    outgoing_past = request.user.sent_trades.exclude(status='pending')
+    return render(request, 'fishbanksapp/view_trades.html', {'incoming_pending': incoming_pending, 'outgoing_pending': outgoing_pending, 'incoming_past':incoming_past, 'outgoing_past':outgoing_past})
+
+@login_required
+def respond_to_trade(request, trade_id, response):
+    trade = get_object_or_404(TradeRequest, id=trade_id, recipient=request.user)
+    if trade.status != 'pending':
+        messages.error(request, 'Trade already responded to.')
+        return redirect('view_trades')
+
+    if response == 'accept':
+        # Transfer money
+        if trade.sender.profile.balance >= trade.money_requested and trade.recipient.profile.balance >= trade.money_offered:
+            date = InGameTime.objects.first().getFormattedTime()
+            Transaction.objects.create(sender=trade.sender, reciever=trade.recipient,
+            transaction_type=Transaction.TransactionType.STORE_TO_PLAYER,
+            content_type=None,
+            object_id=None,
+            date=date)
+            trade.sender.profile.balance += float(trade.money_requested)
+            trade.recipient.profile.balance += float(trade.money_offered)
+            trade.sender.profile.balance -= float(trade.money_offered)
+            trade.recipient.profile.balance -= float(trade.money_requested)
+
+            trade.sender.profile.save()
+            trade.recipient.profile.save()
+
+            # Transfer ships
+            for ship in trade.offered_ships.all():
+                ship.owner = trade.recipient
+                ship.save()
+            for ship in trade.requested_ships.all():
+                ship.owner = trade.sender
+                ship.save()
+
+            trade.status = 'accepted'
+        else:
+            messages.error(request, 'Insufficient balance to complete the trade.')
+            return redirect('view_trades')
+    else:
+        trade.status = 'rejected'
+
+    trade.save()
+    messages.success(request, f'Trade {trade.status}.')
+    return redirect('view_trades')

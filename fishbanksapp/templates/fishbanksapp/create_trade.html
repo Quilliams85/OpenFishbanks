@@ -1,0 +1,10 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+<h1>Create a Trade Request</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <button type="submit">Send Trade</button>
+</form>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'fishbanksapp/base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+<h1>Trades</h1>
+{% if incoming_pending %}
+<h2>Incoming Trade Offers</h2>
+<div class="dashboard">
+    {% for trade in incoming_pending %}
+        <div class="card">
+        <h3>From {{trade.sender}}, {{trade.timestamp}}</h3>
+        <p>{{ trade.sender }} offered you: {{ trade.offered_ships.all|join:", " }} + ${{ trade.money_offered }} <br>
+            Wants: {{ trade.requested_ships.all|join:", " }} + ${{ trade.money_requested }} <br>
+            Status: {{ trade.status }}
+            {% if trade.status == 'pending' %}
+                <form action="{% url 'respond_to_trade' trade.id 'accept' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="buy-button" onclick="return confirm('Are you sure you want to accept this offer?');">
+                        Accept
+                    </button>
+                </form>
+                <p></p>
+                <form action="{% url 'respond_to_trade' trade.id 'reject' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="buy-button" style="background-color:red;" onclick="return confirm('Are you sure you want to decline this offer?');">
+                        Decline
+                    </button>
+                </form>
+            {% endif %}
+        </p>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if outgoing_pending %}
+<h2>Outgoing Trade Offers</h2>
+<div class="dashboard">
+    {% for trade in outgoing_pending %}
+        <div class="card">
+        <h3>To {{trade.reciever}}, {{trade.timestamp}}</h3>
+        <p>You offered {{trade.reciever}}: {{ trade.offered_ships.all|join:", " }} + ${{ trade.money_offered }} <br>
+            in return for: {{ trade.requested_ships.all|join:", " }} + ${{ trade.money_requested }} <br>
+            Status: {{ trade.status }}
+        </p>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<h2>Past Trade Offers</h2>
+
+{% if incoming_past %}
+<h3>Recieved</h3>
+<div class="dashboard">
+    {% for trade in incoming_past %}
+        <div class="card">
+        <h3>From {{trade.sender}}, {{trade.timestamp}}</h3>
+        <p>{{ trade.sender }} offered you: {{ trade.offered_ships.all|join:", " }} + ${{ trade.money_offered }} <br>
+            Wants: {{ trade.requested_ships.all|join:", " }} + ${{ trade.money_requested }} <br>
+            Status: {{ trade.status }}
+        </p>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if outgoing_past %}
+<h3>Sent</h3>
+<div class="dashboard">
+    {% for trade in outgoing_past %}
+        <div class="card">
+        <h3>To {{trade.reciever}}, {{trade.timestamp}}</h3>
+        <p>You offered {{trade.reciever}}: {{ trade.offered_ships.all|join:", " }} + ${{ trade.money_offered }} <br>
+            in return for: {{ trade.requested_ships.all|join:", " }} + ${{ trade.money_requested }} <br>
+            Status: {{ trade.status }}
+        </p>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
