@@ -46,9 +46,14 @@ class BidForm(forms.Form):
 class TradeRequestForm(forms.ModelForm):
     class Meta:
         model = TradeRequest
-        fields = ['recipient', 'offered_ships', 'money_offered', 'requested_ships', 'money_requested']
+        fields = ['offered_ships', 'money_offered', 'requested_ships', 'money_requested']
     
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
+        recipient = kwargs.pop('recipient', None)
         super().__init__(*args, **kwargs)
         self.fields['offered_ships'].queryset = Ship.objects.filter(owner=user)
+        if recipient:
+            self.fields['requested_ships'].queryset = Ship.objects.filter(owner=recipient)
+        else:
+            self.fields['requested_ships'].queryset = Ship.objects.none()

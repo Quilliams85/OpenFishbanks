@@ -2,6 +2,33 @@
 {% block content %}
 {% load crispy_forms_tags %}
 <h1>Trades</h1>
+<h2>Create a Trade Offer</h2>
+<input type="text" id="userSearch" placeholder="Search users..." style="margin-bottom: 10px; padding: 5px; width: 100%;">
+
+<form id="tradeForm" method="get" action="{% url 'create_trade' %}">
+  <select name="recipient" id="recipientSelect" size="10" style="width: 100%;">
+    {% for user in users %}
+      <option value="{{ user.id }}">{{ user.username }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" style="margin-top: 10px;">Initiate Trade</button>
+</form>
+
+<script>
+  const searchInput = document.getElementById('userSearch');
+  const selectBox = document.getElementById('recipientSelect');
+
+  searchInput.addEventListener('input', function () {
+    const filter = this.value.toLowerCase();
+    const options = selectBox.options;
+
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i];
+      const text = option.text.toLowerCase();
+      option.style.display = text.includes(filter) ? '' : 'none';
+    }
+  });
+</script>
 {% if incoming_pending %}
 <h2>Incoming Trade Offers</h2>
 <div class="dashboard">

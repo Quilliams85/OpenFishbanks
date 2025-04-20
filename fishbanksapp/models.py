@@ -42,7 +42,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
     balance = models.FloatField(default=1000.0)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='fishbanksapp/static/profile_pics/', blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     ships_list = models.JSONField(default=dict, encoder=DjangoJSONEncoder)
     history = HistoricalRecords()

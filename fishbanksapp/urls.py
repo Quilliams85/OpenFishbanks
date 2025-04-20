@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import get_game_time
+from register.views import settings_view
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -33,7 +34,8 @@ urlpatterns = [
     path('harbors/', views.harbors, name='harbors'),
     path('harbors/<int:harbor_id>', views.harbor_detail, name='harbor_detail'),
     path('market/', views.fish_market, name='fish_market'),
-    path('trade/create/<int:user_id>', views.create_trade_request, name='create_trade'),
+    path('trade/create/', views.create_trade_request, name='create_trade'),
     path('trade/', views.view_trades, name='view_trades'),
     path('trade/respond/<int:trade_id>/<str:response>/', views.respond_to_trade, name='respond_to_trade'),
+    path('settings/', settings_view, name='settings'),
 ]

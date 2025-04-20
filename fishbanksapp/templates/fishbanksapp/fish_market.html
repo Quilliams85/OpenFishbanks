@@ -3,18 +3,29 @@
 {% load humanize %}
 {% block content %}
 <h1>Fish Market</h1>
-<div class="container">
+<section>
+    <p>
+      This is your guide to the 20 fish species currently populating the waters of OpenFishbanks. Each species has unique traits—
+      value, weight, growth rate, and population—that determine how profitable and sustainable your fishing operation can be.
+    </p>
+  
+    <h3>Strategy Tips:</h3>
+    <ul>
+      <li><strong>Know Your Target:</strong> High-value fish like <em>Bluefin Tuna</em> offer big payoffs but are heavy and grow slowly.
+          Lighter fish like <em>Anchoveta</em> or <em>Herring</em> grow fast and can be harvested in bulk.</li>
+      <li><strong>Think Long-Term:</strong> Overfishing a high-growth species may seem smart short-term—but balance is key to sustainability and profit.</li>
+      <li><strong>Follow the Habitat:</strong> Some species are only found in specific harbors. Expanding your reach lets you access exclusive stocks.</li>
+    </ul>
+  
+    <p><strong>Tracking species trends and making calculated harvesting decisions is essential to dominating the OpenFishbanks economy.</strong></p>
+  </section>  
+<h2>Species:</h2>
+<div class="dashboard">
     {% for fish in species %}
     <div class="card">
         <h2>{{ fish.name }}</h2>
         <p><strong>Current market value:</strong> ${{ fish.value }}</p>
         <p><strong>Found in: </strong>{{ fish.harbor }}</p>
-        <form action="{% url 'harbor_detail' fish.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="buy-button">
-                View Details
-            </button>
-        </form>
 
     </div>
     {% endfor %}

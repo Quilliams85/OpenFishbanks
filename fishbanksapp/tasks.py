@@ -29,21 +29,24 @@ def return_ships():
         for ship in ships:
             if ship.harbor != None:
                 none_assigned = False
-                fish_type = FishSpecies.objects.get(harbor=ship.harbor)
-                total_fish = float(ship.fishing_rate) * float(fish_type.population)
+                fish_types = FishSpecies.objects.filter(harbor=ship.harbor)
+                for fish_type in fish_types:
+                    total_fish = float(ship.fishing_rate) * float(fish_type.population)
 
-                if (total_fish*fish_type.weight) > ship.fishing_capacity:
-                    total_fish = ship.fishing_capacity / fish_type.weight
-                fish_type.population -= total_fish
-                if fish_type.population < 0:
-                    fish_type.population = 0
-                fish_type.save()
+                    if (total_fish*fish_type.weight) > ship.fishing_capacity:
+                        total_fish = ship.fishing_capacity / fish_type.weight
+                    fish_type.population -= total_fish
+                    if fish_type.population < 0:
+                        fish_type.population = 0
+                    fish_type.save()
 
-                revenue = total_fish * float(fish_type.weight) * float(fish_type.value)
-                items[f'{fish_type.name} catch from {ship.nickname}'] = revenue
+                    revenue = total_fish * float(fish_type.weight) * float(fish_type.value)
+                    items[f'{fish_type.name} catch from {ship.nickname}'] = revenue
+
                 if Gas.objects.first() != None:
                     costs[f'gas for {ship.nickname}'] = ship.fishing_capacity * Gas.objects.first().price
                 costs[f'worker salaries for {ship.nickname}'] = 3 * ship.fishing_capacity
+                costs[f'harbor fee for {ship.nickname} @ {ship.harbor.name}'] = ship.harbor.storage_fee
         if not none_assigned:
             invoice = Invoice.objects.create(user=user, revenues=items, costs=costs, date=current_time)
             user.profile.balance += invoice.getProfit()

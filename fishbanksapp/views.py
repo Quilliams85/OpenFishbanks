@@ -408,30 +408,30 @@ def fish_market(request):
 
 
 @login_required
-def create_trade_request(request, user_id):
-    recipient = User.objects.get(id=user_id)
+def create_trade_request(request):
+    recipient_id = request.GET.get('recipient')
+    recipient = get_object_or_404(User, id=recipient_id) if recipient_id else None
     if request.method == 'POST':
-        form = TradeRequestForm(request.POST, user=request.user)
+        form = TradeRequestForm(request.POST, user=request.user, recipient=recipient)
         if form.is_valid():
             trade = form.save(commit=False)
             trade.sender = request.user
+            trade.recipient = recipient
             trade.save()
             form.save_m2m()
-            messages.success(request, 'Trade request sent!')
             return redirect('home')
     else:
-        form = TradeRequestForm(user=request.user)
-        form.fields['requested_ships'].queryset = Ship.objects.filter(owner=recipient)
-        form.fields['recipient'].initial = recipient
-    return render(request, 'fishbanksapp/create_trade.html', {'form': form})
+        form = TradeRequestForm(user=request.user, recipient=recipient)
+    return render(request, 'fishbanksapp/create_trade.html', {'form': form, 'recipient': recipient})
 
 @login_required
 def view_trades(request):
+    users = User.objects.exclude(id=request.user.id)
     incoming_pending = request.user.received_trades.filter(status='pending')
     outgoing_pending = request.user.sent_trades.filter(status='pending')
     incoming_past = request.user.received_trades.exclude(status='pending')
     outgoing_past = request.user.sent_trades.exclude(status='pending')
-    return render(request, 'fishbanksapp/view_trades.html', {'incoming_pending': incoming_pending, 'outgoing_pending': outgoing_pending, 'incoming_past':incoming_past, 'outgoing_past':outgoing_past})
+    return render(request, 'fishbanksapp/view_trades.html', {'incoming_pending': incoming_pending, 'outgoing_pending': outgoing_pending, 'incoming_past':incoming_past, 'outgoing_past':outgoing_past, 'users':users})
 
 @login_required
 def respond_to_trade(request, trade_id, response):

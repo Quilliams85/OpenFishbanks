@@ -4,9 +4,27 @@
 {% block content %}
 <body>
 <h1>Harbors</h1>
-<div class="harbor-container">
+<section>
+    <p>
+      The harbors are the beating heart of the fishing economy. Each harbor acts as a home base for fishing fleets,
+      offering storage for your catches and a location for specific fish species to spawn and thrive. Harbors vary in size,
+      cost, and ecological richness—from small artisanal wharves to massive industrial ports.
+    </p>
+  
+    <h3>Strategy Tips:</h3>
+    <ul>
+      <li><strong>Start Small, Think Big:</strong> Lower-fee harbors like <em>Sandbar Point</em> are great for getting started but may limit your long-term capacity.</li>
+      <li><strong>Match Your Fleet:</strong> Larger ships or high-volume fishing strategies pair well with high-capacity harbors like <em>Ironhook Wharf</em> or <em>Caldera Bay</em>.</li>
+      <li><strong>Diversify:</strong> Consider spreading your operations across multiple harbors to access a wider variety of fish species and trade opportunities.</li>
+      <li><strong>Storage Fee Awareness:</strong> Don’t overlook the storage fees—high-value fish can offset these, but volume without value can drain your profits.</li>
+    </ul>
+  
+    <p><strong>Choose your harbor wisely—it can shape your entire fishing strategy.</strong></p>
+</section>  
+<h2>Harbors:</h2>
+<div class="dashboard">
     {% for harbor in harbors %}
-    <div class="ship-card {% if forloop.counter > 3 %}hidden{% endif %}">
+    <div class="card">
         <h2>{{ harbor.name }}</h2>
         <p><strong>Fee:</strong> {{ harbor.storage_fee }}</p>
         <p>{{ harbor.description }}</p>
@@ -20,21 +38,6 @@
     </div>
     {% endfor %}
 </div>
-
-{% if harbors|length > 3 %}
-<div style="text-align: center; margin-top: 20px;">
-    <button id="showAllButton" class="visit-button" onclick="showAllHarbors()">Show All</button>
-</div>
-{% endif %}
-
-<script>
-    function showAllHarbors() {
-        document.querySelectorAll('.harbor-card.hidden').forEach(harbor => {
-            harbor.classList.remove('hidden');
-        });
-        document.getElementById('showAllButton').style.display = 'none';
-    }
-</script>
 </body>
 
 

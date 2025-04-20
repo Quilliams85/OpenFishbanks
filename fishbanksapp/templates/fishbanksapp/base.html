@@ -30,7 +30,7 @@
                         {% csrf_token %}
                         <button type="submit" style="color:black;">Profile</button>
                     </form>
-                    <form action="{% url 'profile' %}" method="post">
+                    <form action="{% url 'settings' %}" method="post">
                         {% csrf_token %}
                         <button type="submit" style="color:black;">Settings</button>
                     </form>
