@@ -149,15 +149,16 @@ POPULATION_UPDATE_INTERVAL = '1'
 CELERY_BEAT_SCHEDULE = {
     'increment-population-every-minute': {
          'task': 'fishbanksapp.tasks.update_population',
-         #'schedule': 1.0,
          'schedule': crontab(minute='*/{time}'.format(time=POPULATION_UPDATE_INTERVAL)),  # This runs the task every minute
     },
-}
-""" 
-'return-ships': {
+    'return-ships-every-30-minutes': {
          'task': 'fishbanksapp.tasks.return_ships',
-         'schedule': 3.0,
-         #'schedule': crontab(minute='*/{time}'.format(time=POPULATION_UPDATE_INTERVAL)),  # This runs the task every minute
-    }, """
+         'schedule': crontab(minute='*/30'),
+    },
+    'close-auctions-every-30-seconds': {
+         'task': 'fishbanksapp.tasks.return_ships',
+         'schedule': 30.0,
+    },
+}
 
 STATIC_URL = '/static/'
