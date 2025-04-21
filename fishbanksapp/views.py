@@ -63,10 +63,10 @@ def myprofile(request):
     return render(request, 'fishbanksapp/profile.html', context)
 
 def user_profile(request, username):
-    ships = Ship.objects.filter(owner=user)
     user = get_object_or_404(User, username=username)
     profile = user.profile
     groups = Group.objects.filter(members=user)
+    ships = Ship.objects.filter(owner=user)
     context = {
         'profile_user': user,
         'profile': profile,
