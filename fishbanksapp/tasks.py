@@ -31,7 +31,7 @@ def return_ships():
                 none_assigned = False
                 fish_types = FishSpecies.objects.filter(harbor=ship.harbor)
                 for fish_type in fish_types:
-                    total_fish = float(ship.fishing_rate) * float(fish_type.population)
+                    total_fish = (float(ship.fishing_rate) / float(fish_type.weight)) * (float(fish_type.population) / float(fish_type.C))
 
                     if (total_fish*fish_type.weight) > ship.fishing_capacity:
                         total_fish = ship.fishing_capacity / fish_type.weight
@@ -45,7 +45,7 @@ def return_ships():
 
                 if Gas.objects.first() != None:
                     costs[f'gas for {ship.nickname}'] = ship.fishing_capacity * Gas.objects.first().price
-                costs[f'worker salaries for {ship.nickname}'] = 3 * ship.fishing_capacity
+                costs[f'worker salaries for {ship.nickname}'] = 1 * ship.fishing_capacity
                 costs[f'harbor fee for {ship.nickname} @ {ship.harbor.name}'] = ship.harbor.storage_fee
         if not none_assigned:
             invoice = Invoice.objects.create(user=user, revenues=items, costs=costs, date=current_time)

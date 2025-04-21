@@ -156,7 +156,7 @@ CELERY_BEAT_SCHEDULE = {
          'schedule': crontab(minute='*/30'),
     },
     'close-auctions-every-30-seconds': {
-         'task': 'fishbanksapp.tasks.return_ships',
+         'task': 'fishbanksapp.tasks.process_ended_auctions',
          'schedule': 30.0,
     },
 }
@@ -170,3 +170,10 @@ SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Use Redis for the broker
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Use Redis for the backend
+CELERY_TIMEZONE = 'UTC'
