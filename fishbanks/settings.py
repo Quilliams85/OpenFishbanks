@@ -162,3 +162,5 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = 'fishbanksapp/static/'
