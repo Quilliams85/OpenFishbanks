@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-^_dcyup5afnz2wr34a6-0bbl*!vfh$5=91smzm006583k+l52^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["18.117.158.189", '18.222.82.204']
+ALLOWED_HOSTS = ['18.222.82.204', 'openfishbanks.org', 'www.openfishbanks.org']
 
 
 # Application definition
@@ -164,3 +164,9 @@ CELERY_BEAT_SCHEDULE = {
 STATIC_URL = '/static/'
 
 STATIC_ROOT = 'fishbanksapp/static/'
+
+
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
