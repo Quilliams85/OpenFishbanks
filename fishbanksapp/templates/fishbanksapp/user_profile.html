@@ -21,6 +21,17 @@
         <p>Current Balance: {{profile.balance}}</p>
     </div>
     <div class="card">
+        <h2>Fleet</h2>
+        <ul>
+            {% for ship in ships %}
+                <li>
+                    <p>{{ship.name}}[{{ship.nickname}}]</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+    <div class="card">
         <h2>Organizations</h2>
         <ul>
             {% for org in groups %}
