@@ -15,7 +15,8 @@ def register(request):
                                     password=form.cleaned_data['password1'],
                                     )
             login(request, new_user)
-            new_user.profile.balance = 10000
+            new_user.profile.balance = 20000
+            new_user.save()
             Ship.objects.create(name='Starter Ship', fishing_capacity=1000, fishing_rate=500, description='starting vessel', owner=new_user, nickname='Starter Ship', cost=10000)
         return redirect("/")
 
