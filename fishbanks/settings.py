@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-^_dcyup5afnz2wr34a6-0bbl*!vfh$5=91smzm006583k+l52^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['18.222.82.204', 'openfishbanks.org', 'www.openfishbanks.org']
+ALLOWED_HOSTS = ['18.222.82.204', 'openfishbanks.org', 'www.openfishbanks.org', '127.0.0.1']
 
 
 # Application definition
