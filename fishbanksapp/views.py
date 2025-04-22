@@ -11,7 +11,7 @@ from django.http import JsonResponse
 import json
 from datetime import datetime, timedelta
 from .utils import send_invitation_email
-
+import csv
 
 # Create your views here.
 
@@ -477,3 +477,22 @@ def respond_to_trade(request, trade_id, response):
     trade.save()
     messages.success(request, f'Trade {trade.status}.')
     return redirect('view_trades')
+
+
+def export_fish_data_csv(request):
+    # Create the HTTP response with CSV headers
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="fish_data.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Species Name', 'Timestamp', 'Population'])
+
+    for species in FishSpecies.objects.all():
+        for his in species.history.all().order_by('history_date'):
+            writer.writerow([
+                species.name,
+                his.history_date.strftime('%Y-%m-%d %H:%M:%S'),
+                his.population
+            ])
+
+    return response

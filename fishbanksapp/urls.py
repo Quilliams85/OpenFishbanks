@@ -38,4 +38,5 @@ urlpatterns = [
     path('trade/', views.view_trades, name='view_trades'),
     path('trade/respond/<int:trade_id>/<str:response>/', views.respond_to_trade, name='respond_to_trade'),
     path('settings/', settings_view, name='settings'),
+    path('api/get-species', views.export_fish_data_csv, name='get-species'),
 ]
