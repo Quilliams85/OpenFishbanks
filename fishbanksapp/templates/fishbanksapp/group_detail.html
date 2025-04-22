@@ -4,6 +4,9 @@
         <h1>{{ group.name }}</h1>
         <p>Created by: {{ group.owner.username }}</p>
 
+        <h2>About</h2>
+        <p>{{group.description}}</p>
+
         <h2>Members</h2>
         <ul class="list-group">
             {% for member in group.members.all %}
