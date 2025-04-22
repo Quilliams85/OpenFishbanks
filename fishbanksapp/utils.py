@@ -1,7 +1,7 @@
 from django.core.mail import send_mail
-from .models import Harbor, FishSpecies, ManufacturerShip, Gas, InGameTime
+from .models import Harbor, FishSpecies, ManufacturerShip, Gas, InGameTime, Ship, Invoice, AuctionListing, Transaction, Group
 import random
-
+from django.contrib.auth.models import User
 
 def send_invitation_email(invitation):
     subject = f"Invitation to join {invitation.group.name}"
@@ -136,3 +136,16 @@ def setup_sim():
 
     time = InGameTime.objects.create(game_start_time=1893477600)
     time.resetTime()
+
+
+def reset_db():
+    User.objects.all().delete()
+    FishSpecies.objects.all().delete()
+    ManufacturerShip.objects.all().delete()
+    Ship.objects.all().delete()
+    Gas.objects.all().delete()
+    Harbor.objects.all().delete()
+    Invoice.objects.all().delete()
+    AuctionListing.objects.all().delete()
+    Transaction.objects.all().delete()
+    Group.objects.all().delete()
