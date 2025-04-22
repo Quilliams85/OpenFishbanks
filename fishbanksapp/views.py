@@ -12,6 +12,7 @@ import json
 from datetime import datetime, timedelta
 from .utils import send_invitation_email
 import csv
+from collections import defaultdict
 
 # Create your views here.
 
@@ -480,19 +481,32 @@ def respond_to_trade(request, trade_id, response):
 
 
 def export_fish_data_csv(request):
-    # Create the HTTP response with CSV headers
+    # Gather data: {timestamp: {species_name: population}}
+    data_by_timestamp = defaultdict(dict)
+    species_names = []
+
+    for species in FishSpecies.objects.all():
+        species_names.append(species.name)
+        for his in species.history.all():
+            timestamp = his.history_date
+            data_by_timestamp[timestamp][species.name] = his.population
+
+    # Sort timestamps for output order
+    sorted_timestamps = sorted(data_by_timestamp.keys())
+
+    # Prepare CSV response
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="fish_data.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Species Name', 'Timestamp', 'Population'])
+    # Write header: timestamp, species1, species2, ...
+    writer.writerow(['timestamp'] + species_names)
 
-    for species in FishSpecies.objects.all():
-        for his in species.history.all().order_by('history_date'):
-            writer.writerow([
-                species.name,
-                his.history_date.strftime('%Y-%m-%d %H:%M:%S'),
-                his.population
-            ])
+    # Write rows
+    for timestamp in sorted_timestamps:
+        row = [timestamp]
+        for name in species_names:
+            row.append(data_by_timestamp[timestamp].get(name, ''))
+        writer.writerow(row)
 
     return response
