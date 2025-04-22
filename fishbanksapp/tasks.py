@@ -31,7 +31,7 @@ def return_ships():
                 none_assigned = False
                 fish_types = FishSpecies.objects.filter(harbor=ship.harbor)
                 for fish_type in fish_types:
-                    total_fish = (float(ship.fishing_rate) / float(fish_type.weight)) * (float(fish_type.population) / float(fish_type.C))
+                    total_fish = (float(ship.fishing_rate) / float(fish_type.weight)) * ((float(fish_type.population) / float(fish_type.C)) ** 2)
 
                     if (total_fish*fish_type.weight) > ship.fishing_capacity:
                         total_fish = ship.fishing_capacity / fish_type.weight
