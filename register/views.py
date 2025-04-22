@@ -16,7 +16,7 @@ def register(request):
                                     )
             login(request, new_user)
             new_user.profile.balance = 10000
-            Ship.objects.create(name='Starter Ship', fishing_capacity=1000, fishing_rate=5000, description='starting vessel', owner=new_user, nickname='Starter Ship', cost=10000)
+            Ship.objects.create(name='Starter Ship', fishing_capacity=1000, fishing_rate=500, description='starting vessel', owner=new_user, nickname='Starter Ship', cost=10000)
         return redirect("/")
 
     else:
