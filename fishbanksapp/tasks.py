@@ -4,6 +4,7 @@ from .models import FishSpecies, Profile, Ship, Invoice, InGameTime, Harbor, Gas
 from fishbanks.settings import POPULATION_UPDATE_INTERVAL
 from django.contrib.auth.models import User
 import numpy as np
+import random
 
 
 @shared_task
@@ -41,7 +42,7 @@ def return_ships():
                     fish_type.save()
 
                     revenue = total_fish * float(fish_type.weight) * float(fish_type.value)
-                    items[f'{fish_type.name} catch from {ship.nickname}'] = revenue
+                    items[f'{fish_type.name} catch from {ship.nickname}[{ship.id}]'] = revenue
 
                 if Gas.objects.first() != None:
                     costs[f'gas for {ship.nickname}'] = ship.fishing_capacity * Gas.objects.first().price
@@ -52,10 +53,13 @@ def return_ships():
             user.profile.balance += invoice.getProfit()
             user.save()
 
+    update_market_value()
+
 def update_market_value():
     for species in FishSpecies:
-        species.value
+        species.value *= random.uniform(0.75,1.5)
 
 @shared_task
 def process_ended_auctions():
     AuctionListing.check_ended_auctions()
+
