@@ -481,32 +481,37 @@ def respond_to_trade(request, trade_id, response):
 
 
 def export_fish_data_csv(request):
-    # Gather data: {timestamp: {species_name: population}}
-    data_by_timestamp = defaultdict(dict)
-    species_names = []
+    # Step 1: Gather all history entries and round timestamps
+    species_names = [species.name for species in FishSpecies.objects.all()]
+    data_by_time = defaultdict(dict)
 
     for species in FishSpecies.objects.all():
-        species_names.append(species.name)
         for his in species.history.all():
-            timestamp = his.history_date
-            data_by_timestamp[timestamp][species.name] = his.population
+            # Round to nearest second (or minute, if you prefer)
+            rounded_time = his.history_date.replace(microsecond=0)
+            data_by_time[rounded_time][species.name] = his.population
 
-    # Sort timestamps for output order
-    sorted_timestamps = sorted(data_by_timestamp.keys())
+    # Step 2: Sort timestamps
+    sorted_timestamps = sorted(data_by_time.keys())
 
-    # Prepare CSV response
+    # Step 3: Prepare CSV response
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="fish_data.csv"'
 
     writer = csv.writer(response)
-    # Write header: timestamp, species1, species2, ...
     writer.writerow(['timestamp'] + species_names)
 
-    # Write rows
+    # Step 4: Build and write rows
+    last_known_values = {name: '' for name in species_names}
+
     for timestamp in sorted_timestamps:
-        row = [timestamp]
+        # Update last known values if available
         for name in species_names:
-            row.append(data_by_timestamp[timestamp].get(name, ''))
+            if name in data_by_time[timestamp]:
+                last_known_values[name] = data_by_time[timestamp][name]
+
+        # Write row with the most recent known values
+        row = [timestamp] + [last_known_values[name] for name in species_names]
         writer.writerow(row)
 
     return response
