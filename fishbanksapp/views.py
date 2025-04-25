@@ -481,37 +481,35 @@ def respond_to_trade(request, trade_id, response):
 
 
 def export_fish_data_csv(request):
-    # Step 1: Gather all history entries and round timestamps
-    species_names = [species.name for species in FishSpecies.objects.all()]
-    data_by_time = defaultdict(dict)
+    species = list(FishSpecies.objects.all())
+    species_names = [s.name for s in species]
 
-    for species in FishSpecies.objects.all():
-        for his in species.history.all():
-            # Round to nearest second (or minute, if you prefer)
-            rounded_time = his.history_date.replace(microsecond=0)
-            data_by_time[rounded_time][species.name] = his.population
+    # Assume the first species sets the timestamps
+    primary_species = species[0]
+    primary_history = list(primary_species.history.all())
+    num_entries = len(primary_history)
 
-    # Step 2: Sort timestamps
-    sorted_timestamps = sorted(data_by_time.keys())
+    # Collect histories for all species
+    all_histories = [list(s.history.all()) for s in species]
 
-    # Step 3: Prepare CSV response
+    # Prepare CSV response
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="fish_data.csv"'
 
     writer = csv.writer(response)
     writer.writerow(['timestamp'] + species_names)
 
-    # Step 4: Build and write rows
-    last_known_values = {name: '' for name in species_names}
+    # Write one row per timestamp, assuming index alignment
+    for i in range(num_entries):
+        timestamp = primary_history[i].history_date
+        row = [timestamp]
 
-    for timestamp in sorted_timestamps:
-        # Update last known values if available
-        for name in species_names:
-            if name in data_by_time[timestamp]:
-                last_known_values[name] = data_by_time[timestamp][name]
+        for history in all_histories:
+            if i < len(history):
+                row.append(history[i].population)
+            else:
+                row.append('')  # Fill with blank if not enough entries
 
-        # Write row with the most recent known values
-        row = [timestamp] + [last_known_values[name] for name in species_names]
         writer.writerow(row)
 
     return response
