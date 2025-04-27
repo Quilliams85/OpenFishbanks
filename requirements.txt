@@ -7,3 +7,6 @@ django-simple-history>=3.0
 Pillow
 crispy-bootstrap4
 django-crispy-forms
+celery[redis]
+django-celery-beat
+django-cors-headers

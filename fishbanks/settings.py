@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "simple_history",
     "celery",
     'django.contrib.humanize',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +56,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = "fishbanks.urls"
@@ -177,3 +180,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Use Redis for the backend
 CELERY_TIMEZONE = 'UTC'
+
+CORS_ALLOWED_ORIGINS = [
+    'https://your-domain.com',  # Add your website's domain here
+]
