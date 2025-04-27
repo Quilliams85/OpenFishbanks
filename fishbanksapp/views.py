@@ -380,8 +380,13 @@ def place_bid(request, auction_id):
         form = BidForm(request.POST)
         if form.is_valid():
             bid_amount = form.cleaned_data["bid_amount"]
-            
-            if bid_amount > auction.current_bid:  # Ensure it's a higher bid
+            if auction.current_bid == 0:
+                form.fields['bid_amount'].initial = auction.starting_bid + 500.0
+                auction.current_bid = auction.starting_bid
+                auction.save()
+            else:
+                form.fields['bid_amount'].initial = auction.current_bid + 500.0
+            if bid_amount > auction.current_bid + 500.0:  # Ensure it's a higher bid and 500 more
                 auction.current_bid = bid_amount
                 auction.current_bidder = request.user
                 auction.save()
