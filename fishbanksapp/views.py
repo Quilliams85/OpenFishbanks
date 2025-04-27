@@ -533,4 +533,8 @@ def api_leaderboard(request):
         'users': sorted_users,
         'user_groups':user_groups
     }
-    return JsonResponse(context)
+    usernames = {}
+    for user in sorted_users:
+        usernames[user.username] = user.balance
+
+    return JsonResponse(usernames)
