@@ -22,6 +22,8 @@ def return_ships():
     t = InGameTime.objects.first()
     current_time = t.getFormattedTime()
 
+    species_fished = {}
+
     for user in User.objects.all():
         items = {}
         costs = {}
@@ -32,6 +34,8 @@ def return_ships():
                 none_assigned = False
                 fish_types = FishSpecies.objects.filter(harbor=ship.harbor)
                 for fish_type in fish_types:
+
+
                     total_fish = (float(ship.fishing_rate) / float(fish_type.weight)) * ((float(fish_type.population) / float(fish_type.C)) ** 2)
 
                     if (total_fish*fish_type.weight) > ship.fishing_capacity:
@@ -40,6 +44,11 @@ def return_ships():
                     if fish_type.population < 0:
                         fish_type.population = 0
                     fish_type.save()
+
+                    if species_fished[f'{fish_type.name}'] == None:
+                        species_fished[f'{fish_type.name}'] = total_fish
+                    else:
+                        species_fished[f'{fish_type.name}'] += total_fish
 
                     revenue = total_fish * float(fish_type.weight) * float(fish_type.value)
                     items[f'{fish_type.name} catch from {ship.nickname}[{ship.id}]'] = revenue
@@ -53,11 +62,19 @@ def return_ships():
             user.profile.balance += invoice.getProfit()
             user.save()
 
-    update_market_value()
+    update_market_value(species_fished)
 
-def update_market_value():
+def update_market_value(dict):
+    total_fish = 0
+    fluctuation_constant = 0.1
+    if dict != None:
+        for fish in dict:
+            total_fish += dict[fish]
+    
     for species in FishSpecies:
-        species.value *= random.uniform(0.75,1.5)
+        prop = dict[f'{species.name}'] / total_fish
+        species.value /= ((1 + prop*fluctuation_constant) * random.uniform(0.9,1.112))
+        species.save()
 
 @shared_task
 def process_ended_auctions():
