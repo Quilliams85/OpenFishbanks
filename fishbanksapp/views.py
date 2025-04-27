@@ -517,39 +517,10 @@ def export_fish_data_csv(request):
 
 
 def api_leaderboard(request):
-    # Fetch all users and sort them by balance in descending order
-    users = User.objects.all()  
+    users = User.objects.all()  # Fetch all users
     sorted_users = sorted(users, key=lambda user: user.profile.balance, reverse=True)
-
-    # Initialize the 'data' list to store formatted user data
-    data = []
-
-    # Create formatted data for each user
+    usernames = {}
     for user in sorted_users:
-        user_data = {
-            "attributes": {
-                "revenue": user.profile.balance,  # This can be replaced with actual revenue if applicable
-                "arrival_time": datetime.now().isoformat(),  # Use current time for demonstration
-                "departure_time": (datetime.now() + timedelta(minutes=2)).isoformat(),  # Example future time
-                "arrival_uncertainty": None,
-                "departure_uncertainty": None,
-                "direction_id": 1,
-                "last_trip": False,
-                "schedule_relationship": None,
-                "status": None,
-                "stop_sequence": sorted_users.index(user) + 1,  # Example sequence number
-                "update_type": None
-            },
-            "id": f"leaderboard-{user.username}",
-            "relationships": {
-                "route": {"data": {"id": "CR-Fitchburg", "type": "route"}},
-                "stop": {"data": {"id": "FR-0201-02", "type": "stop"}}  # This is just an example; adjust as needed
-            },
-            "type": "prediction"
-        }
+        usernames[user.username] = user.balance
 
-        # Add the user data to the list
-        data.append(user_data)
-
-    # Return the formatted response
-    return JsonResponse({"data": data, "jsonapi": {"version": "1.0"}})
+    return JsonResponse(usernames)
