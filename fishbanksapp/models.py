@@ -134,10 +134,14 @@ class ManufacturerShip(models.Model):
     fishing_rate = models.IntegerField()
     base_cost = models.FloatField()
     description = models.TextField(blank=True, null=True)
+    stock = models.IntegerField(default=20)
+    max_stock = models.IntegerField(default=30)
 
     def sellShip(self, customer):
         ship = Ship.objects.create(name=self.name, fishing_capacity=self.fishing_capacity, fishing_rate=self.fishing_rate, description=self.description, owner=customer, nickname=self.name, cost=self.base_cost)
         date = InGameTime.objects.first().getFormattedTime()
+        self.stock -= 1
+        self.save()
         Transaction.objects.create(sender=None, reciever=customer,
             transaction_type=Transaction.TransactionType.STORE_TO_PLAYER,
             content_type=ContentType.objects.get_for_model(Ship),

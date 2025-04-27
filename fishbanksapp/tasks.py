@@ -1,6 +1,6 @@
 from celery import shared_task
 from django.db.models import F
-from .models import FishSpecies, Profile, Ship, Invoice, InGameTime, Harbor, Gas, AuctionListing
+from .models import FishSpecies, Profile, Ship, Invoice, InGameTime, Harbor, Gas, AuctionListing, ManufacturerShip, Transaction
 from fishbanks.settings import POPULATION_UPDATE_INTERVAL
 from django.contrib.auth.models import User
 import numpy as np
@@ -76,4 +76,20 @@ def update_market_value(dict):
 @shared_task
 def process_ended_auctions():
     AuctionListing.check_ended_auctions()
+
+@shared_task
+def update_ship_stock_and_price():
+    restock_constant = 0.2
+    for ship in ManufacturerShip.objects.all():
+        if ship.stock <= ship.max_stock:
+            ship.stock += int(restock_constant * (ship.max_stock/(ship.stock + 1)))
+            ship.save()
+
+
+""" def calculate_demand(ship):
+    purchases = {}
+    for purchase in Transaction.objects.filter(type='S2P'):
+        ship = Ship.objects.get(id = purchase.object_id)
+        purchases[f'ship.name'] += 1 """
+    
 

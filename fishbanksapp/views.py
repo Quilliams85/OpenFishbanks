@@ -44,7 +44,8 @@ def purchase_ship(request, ship_id):
     ship = get_object_or_404(ManufacturerShip, id=ship_id)
     user = request.user
 
-    if user.profile.balance >= ship.base_cost:
+
+    if (user.profile.balance >= ship.base_cost) and (ship.stock > 0):
         user.profile.balance -= ship.base_cost
         user.profile.save()
         ship.sellShip(user)

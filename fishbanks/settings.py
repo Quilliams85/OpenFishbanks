@@ -158,6 +158,10 @@ CELERY_BEAT_SCHEDULE = {
          'task': 'fishbanksapp.tasks.return_ships',
          'schedule': crontab(minute='*/30'),
     },
+    'update-ship-stock': {
+         'task': 'fishbanksapp.tasks.update_ship_stock_and_price',
+         'schedule': crontab(minute='*/30'),
+    },
     'close-auctions-every-30-seconds': {
          'task': 'fishbanksapp.tasks.process_ended_auctions',
          'schedule': 30.0,
