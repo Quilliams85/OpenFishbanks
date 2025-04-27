@@ -2,9 +2,6 @@ from django.core.mail import send_mail
 from .models import Harbor, FishSpecies, ManufacturerShip, Gas, InGameTime, Ship, Invoice, AuctionListing, Transaction, Group
 import random
 from django.contrib.auth.models import User
-import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.dates import DateFormatter
 
 def send_invitation_email(invitation):
     subject = f"Invitation to join {invitation.group.name}"
@@ -153,32 +150,3 @@ def reset_db():
     Transaction.objects.all().delete()
     Group.objects.all().delete()
 
-
-def graph_data():
-    # Load the data
-    df = pd.read_csv('fish_data (7).csv', parse_dates=['timestamp'])
-
-    # Set timestamp as index
-    df.set_index('timestamp', inplace=True)
-
-    # Plotting the top 5 species by maximum count
-    top_species = df.max().sort_values(ascending=False).head(5).index
-
-    plt.figure(figsize=(12, 6))
-
-    for species in top_species:
-        plt.plot(df.index, df[species], label=species)
-
-    plt.title('Top 5 Fish Species Over Time', fontsize=14)
-    plt.xlabel('Time', fontsize=12)
-    plt.ylabel('Count', fontsize=12)
-    plt.legend()
-    plt.grid(True)
-
-    # Format x-axis for better time display
-    date_form = DateFormatter("%H:%M")
-    plt.gca().xaxis.set_major_formatter(date_form)
-    plt.xticks(rotation=45)
-
-    plt.tight_layout()
-    plt.show()
