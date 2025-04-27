@@ -535,6 +535,6 @@ def api_leaderboard(request):
     }
     usernames = {}
     for user in sorted_users:
-        usernames[user.username] = user.balance
+        usernames[user.username] = user.profile.balance
 
     return JsonResponse(usernames)
