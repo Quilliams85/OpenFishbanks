@@ -33,11 +33,11 @@
             <!-- BID FORM -->
             <p></p>
             {% if not listing.current_bidder %}
-            <p><i>No Bids have been placed</i></p>
+            <p><i>No Bids have been placed, starting bid is {{listing.starting_bid}}</i></p>
             {% else %}
             <p><strong>Current Bid:</strong> {{ listing.current_bid }} (submitted by {{listing.current_bidder}})</p>
             {% endif %}
-            <p><strong>Enter Bid:</strong></p>
+            <p><strong>Enter Bid<i>(must be minimum 500 greater than current)</i>:</strong></p>
             <form method="post" action="{% url 'place_bid' listing.id %}">
                 {% csrf_token %}
                 {% with bid_form=bid_forms|dict_get:listing.id %}
