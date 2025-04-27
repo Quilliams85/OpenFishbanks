@@ -342,7 +342,8 @@ def leave_group(request, group_id):
 @login_required
 def delete_group(request, group_id):
     group = Group.objects.get(id=group_id)
-    group.delete()
+    if request.user == group.owner:
+        group.delete()
     return redirect('groups')
 
 @login_required
@@ -365,11 +366,12 @@ def create_listing(request, ship_id):
 
 @login_required
 def buy_now(request, auction_id):
-    listing = AuctionListing.objects.get(id=auction_id)
-    listing.current_bidder = request.user
-    listing.current_bid = listing.buy_now_price
-    listing.save()
-    listing.sellShip()
+    if request.user.profile.balance > listing.current_bid:
+        listing = AuctionListing.objects.get(id=auction_id)
+        listing.current_bidder = request.user
+        listing.current_bid = listing.buy_now_price
+        listing.save()
+        listing.sellShip()
     return redirect('inventory')
 
 @login_required
@@ -380,13 +382,13 @@ def place_bid(request, auction_id):
         form = BidForm(request.POST)
         if form.is_valid():
             bid_amount = form.cleaned_data["bid_amount"]
-            if bid_amount >= auction.current_bid + 500.0:  # Ensure it's a higher bid and 500 more
+            if (bid_amount >= auction.current_bid + 500.0) and request.user.profile.balance > bid_amount:  # Ensure it's a higher bid and 500 more
                 auction.current_bid = bid_amount
                 auction.current_bidder = request.user
                 auction.save()
                 messages.success(request, "Your bid was placed successfully!")
             else:
-                messages.error(request, "Your bid must be higher than the current bid.")
+                messages.error(request, "Your bid must be higher than the current bid or insufficient funds.")
 
     return redirect("shop")  # Redirect to auction detail page
 
