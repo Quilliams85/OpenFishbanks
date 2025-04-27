@@ -68,7 +68,7 @@ def update_market_value(dict):
         for fish in dict:
             total_fish += dict[fish]
     
-    for species in FishSpecies:
+    for species in FishSpecies.objects.all():
         prop = dict[f'{species.name}'] / total_fish
         species.value /= ((1 + prop*fluctuation_constant) * random.uniform(0.9,1.112))
         species.save()
