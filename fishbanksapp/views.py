@@ -474,7 +474,6 @@ def respond_to_trade(request, trade_id, response):
             return redirect('view_trades')
     else:
         trade.status = 'rejected'
-
     trade.save()
     messages.success(request, f'Trade {trade.status}.')
     return redirect('view_trades')
@@ -515,3 +514,23 @@ def export_fish_data_csv(request):
         writer.writerow(row)
 
     return response
+
+
+def api_leaderboard(request):
+    users = User.objects.all()  # Fetch all users
+    sorted_users = sorted(users, key=lambda user: user.profile.balance, reverse=True)
+    user_groups = {}
+
+    for user in sorted_users: # get groups for user and assign in dict
+        groups = Group.objects.filter(members=user)
+        if not groups:
+            user_groups[user] = None
+        else:
+            for group in groups:      
+                user_groups[user] = group
+
+    context = {
+        'users': sorted_users,
+        'user_groups':user_groups
+    }
+    return JsonResponse(context)
