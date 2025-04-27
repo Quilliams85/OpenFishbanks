@@ -44,11 +44,8 @@ def return_ships():
                     if fish_type.population < 0:
                         fish_type.population = 0
                     fish_type.save()
+                    species_fished[f'{fish_type.name}'] = species_fished.get(f'{fish_type.name}', 0) + total_fish
 
-                    if species_fished[f'{fish_type.name}'] == None:
-                        species_fished[f'{fish_type.name}'] = total_fish
-                    else:
-                        species_fished[f'{fish_type.name}'] += total_fish
 
                     revenue = total_fish * float(fish_type.weight) * float(fish_type.value)
                     items[f'{fish_type.name} catch from {ship.nickname}[{ship.id}]'] = revenue
