@@ -33,6 +33,13 @@ def shop(request):
 
     bid_forms = {listing.id: BidForm() for listing in listings}
 
+    for form in bid_forms:
+        auction = bid_forms[form]
+        if auction.current_bid == 0:
+            form.fields['bid_amount'].initial = auction.starting_bid + 500.0
+        else:
+            form.fields['bid_amount'].initial = auction.current_bid + 500.0
+
     return render(request, 'fishbanksapp/shop.html', {
         'ships': ships,
         'listings': listings,
@@ -380,13 +387,7 @@ def place_bid(request, auction_id):
         form = BidForm(request.POST)
         if form.is_valid():
             bid_amount = form.cleaned_data["bid_amount"]
-            if auction.current_bid == 0:
-                form.fields['bid_amount'].initial = auction.starting_bid + 500.0
-                auction.current_bid = auction.starting_bid
-                auction.save()
-            else:
-                form.fields['bid_amount'].initial = auction.current_bid + 500.0
-            if bid_amount > auction.current_bid + 500.0:  # Ensure it's a higher bid and 500 more
+            if bid_amount >= auction.current_bid + 500.0:  # Ensure it's a higher bid and 500 more
                 auction.current_bid = bid_amount
                 auction.current_bidder = request.user
                 auction.save()
