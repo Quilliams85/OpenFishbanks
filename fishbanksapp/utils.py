@@ -73,120 +73,141 @@ def setup_sim():
 
     ManufacturerShip.objects.create(
         name="Outrigger Trawler",
-        fishing_capacity=5000,
-        fishing_rate=2500,
+        fishing_capacity=2000,
+        fishing_rate=1000,
         base_cost=50000,
-        description="A versatile and cost-effective trawler, ideal for coastal waters."
+        description="A versatile and cost-effective trawler, ideal for coastal waters.",
+        max_stock=50
     )
 
     ManufacturerShip.objects.create(
         name="Small Seiner",
-        fishing_capacity=8000,
-        fishing_rate=4000,
+        fishing_capacity=3200,
+        fishing_rate=1600,
         base_cost=90000,
-        description="A compact seiner for efficient small-to-medium scale fishing."
+        description="A compact seiner for efficient small-to-medium scale fishing.",
+        max_stock=45
     )
 
     ManufacturerShip.objects.create(
         name="Seiner",
-        fishing_capacity=15000,
-        fishing_rate=7500,
+        fishing_capacity=6000,
+        fishing_rate=3000,
         base_cost=200000,
-        description="A reliable vessel with advanced netting for larger catches."
+        description="A reliable vessel with advanced netting for larger catches.",
+        max_stock=40
     )
 
     ManufacturerShip.objects.create(
         name="Large Seiner",
-        fishing_capacity=23000,
-        fishing_rate=11500,
+        fishing_capacity=9200,
+        fishing_rate=4600,
         base_cost=325000,
-        description="Enhanced storage and hauling systems for bigger fishing hauls."
+        description="Enhanced storage and hauling systems for bigger fishing hauls.",
+        max_stock=36
     )
 
     ManufacturerShip.objects.create(
         name="Stern Trawler",
-        fishing_capacity=45000,
-        fishing_rate=22500,
+        fishing_capacity=18000,
+        fishing_rate=9000,
         base_cost=500000,
-        description="A robust deep-sea trawler for high-volume commercial ventures."
+        description="A robust deep-sea trawler for high-volume commercial ventures.",
+        max_stock=32
     )
 
     ManufacturerShip.objects.create(
         name="Ocean Stern Trawler",
-        fishing_capacity=60000,
-        fishing_rate=30000,
+        fishing_capacity=24000,
+        fishing_rate=12000,
         base_cost=750000,
-        description="Extended range and reinforced hull for heavier catches."
+        description="Extended range and reinforced hull for heavier catches.",
+        max_stock=28
     )
 
     ManufacturerShip.objects.create(
         name="Longliner",
-        fishing_capacity=75000,
-        fishing_rate=37500,
+        fishing_capacity=30000,
+        fishing_rate=15000,
         base_cost=1000000,
-        description="A high-capacity longliner suited for open ocean expeditions."
+        description="A high-capacity longliner suited for open ocean expeditions.",
+        max_stock=25
     )
 
     ManufacturerShip.objects.create(
         name="Industrial Longliner",
-        fishing_capacity=125000,
-        fishing_rate=62500,
+        fishing_capacity=50000,
+        fishing_rate=25000,
         base_cost=2000000,
-        description="Industrial-scale longliner designed for massive sustained catches."
+        description="Industrial-scale longliner designed for massive sustained catches.",
+        max_stock=20
     )
 
     ManufacturerShip.objects.create(
         name="Factory Longliner",
-        fishing_capacity=250000,
-        fishing_rate=125000,
+        fishing_capacity=100000,
+        fishing_rate=50000,
         base_cost=10000000,
-        description="Combines massive capacity with onboard processing plants."
+        description="Combines massive capacity with onboard processing plants.",
+        max_stock=10
     )
 
     ManufacturerShip.objects.create(
         name="Mini Factory Ship",
-        fishing_capacity=400000,
-        fishing_rate=200000,
+        fishing_capacity=160000,
+        fishing_rate=80000,
         base_cost=20000000,
-        description="A smaller factory ship with significant automation and storage."
+        description="A smaller factory ship with significant automation and storage.",
+        max_stock=8
     )
 
     ManufacturerShip.objects.create(
         name="Automated Factory Ship",
-        fishing_capacity=600000,
-        fishing_rate=300000,
+        fishing_capacity=240000,
+        fishing_rate=120000,
         base_cost=35000000,
-        description="Fully automated giant trawler with AI-driven harvesting systems."
+        description="Fully automated giant trawler with AI-driven harvesting systems.",
+        max_stock=6
     )
 
     ManufacturerShip.objects.create(
         name="Hyper Trawler",
-        fishing_capacity=900000,
-        fishing_rate=450000,
+        fishing_capacity=360000,
+        fishing_rate=180000,
         base_cost=60000000,
-        description="High-efficiency vessel maximizing catch volume and speed."
+        description="High-efficiency vessel maximizing catch volume and speed.",
+        max_stock=5
     )
 
     ManufacturerShip.objects.create(
         name="Oceanic Megatrawler",
-        fishing_capacity=1250000,
-        fishing_rate=625000,
+        fishing_capacity=500000,
+        fishing_rate=250000,
         base_cost=100000000,
-        description="Pinnacle of fishing technology; massive storage and processing."
+        description="Pinnacle of fishing technology; massive storage and processing.",
+        max_stock=4
     )
 
     ManufacturerShip.objects.create(
         name="Leviathan Dredger",
-        fishing_capacity=3000000,
-        fishing_rate=1500000,
+        fishing_capacity=1200000,
+        fishing_rate=600000,
         base_cost=250000000,
-        description="The ultimate ultra-massive dredger reshaping marine economies."
+        description="The ultimate ultra-massive dredger reshaping marine economies.",
+        max_stock=2
     )
+
 
 
 
     time = InGameTime.objects.create(game_start_time=1893477600)
     time.resetTime()
+
+    if User.objects.all() != None:
+        for user in User.objects.all():
+            Ship.objects.create(name='Starter Ship', fishing_capacity=1000, fishing_rate=500, description='starting vessel', owner=user, nickname='Starter Ship', cost=50000)
+
+
 
 
 def reset_db():
@@ -202,4 +223,3 @@ def reset_db():
     AuctionListing.objects.all().delete()
     Transaction.objects.all().delete()
     Group.objects.all().delete()
-
