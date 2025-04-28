@@ -62,6 +62,7 @@ def return_ships():
     update_market_value(species_fished)
 
 def update_market_value(dict):
+    base_change = 0.9
     total_fish = 0
     fluctuation_constant = 0.1
     if dict != None:
@@ -70,7 +71,7 @@ def update_market_value(dict):
     
     for species in FishSpecies.objects.all():
         prop = dict[f'{species.name}'] / total_fish
-        species.value /= ((1 + prop*fluctuation_constant) * random.uniform(0.9,1.112))
+        species.value /= ((base_change + prop*fluctuation_constant) * random.uniform(0.9,1.112))
         species.save()
 
 @shared_task
@@ -81,7 +82,7 @@ def process_ended_auctions():
 def update_ship_stock_and_price():
     restock_constant = 2
     for ship in ManufacturerShip.objects.all():
-        if ship.stock <= ship.max_stock:
+        if ship.stock < ship.max_stock:
             ship.stock += int(restock_constant * (ship.max_stock/(ship.stock + 1)))
             ship.save()
 
