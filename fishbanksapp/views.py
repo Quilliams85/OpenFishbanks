@@ -393,7 +393,6 @@ def place_bid(request, auction_id):
     return redirect("shop")  # Redirect to auction detail page
 
 @login_required
-
 def harbors(request):
     harbors = Harbor.objects.all()
     return render(request, 'fishbanksapp/harbors.html', {'harbors': harbors})
