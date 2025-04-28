@@ -80,10 +80,12 @@ def process_ended_auctions():
 
 @shared_task
 def update_ship_stock_and_price():
-    restock_constant = 2
+    restock_constant = 1.5
     for ship in ManufacturerShip.objects.all():
         if ship.stock < ship.max_stock:
             ship.stock += int(restock_constant * (ship.max_stock/(ship.stock + 1)))
+            if ship.stock > ship.max_stock:
+                ship.stock = ship.max_stock
             ship.save()
 
 
