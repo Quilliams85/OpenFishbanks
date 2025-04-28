@@ -534,7 +534,7 @@ def net_worth_leaderboard(request):
     for user in users:
         balance = user.profile.balance
         for ship in Ship.objects.filter(owner=user):
-            balance += ship.value
+            balance += ship.cost
         net_worths[user.username] = balance
 
     sorted_users = sorted(users, key=lambda user: net_worths[user.username], reverse=True)
