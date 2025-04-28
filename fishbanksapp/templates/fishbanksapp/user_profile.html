@@ -1,4 +1,5 @@
 {% extends 'fishbanksapp/base.html' %}
+{% load humanize %}
 {% block content %}
 <h1>{{ profile_user.username }}</h1>
 {% if user == profile_user%}
