@@ -18,7 +18,7 @@
     </div>
     <div class="card">
         <h2>Financials</h2>
-        <p>Current Balance: {{profile.balance}}</p>
+        <p>Current Balance: ${{profile.balance|floatformat:2|intcomma}}</p>
     </div>
     <div class="card">
         <h2>Fleet</h2>

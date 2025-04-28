@@ -21,14 +21,14 @@
         <h2>This Year's Return</h2>
         {%if balance_increase > 0 %}
         <h3 style="color:green;">
-            <strong>${{balance_increase|intcomma}}&uarr;</strong>
+            <strong>${{balance_increase|floatformat:2|intcomma}}&uarr;</strong>
         </h3>
         {% else %}
             {% if balance_increase == 0 %}
-            <h3><strong>${{balance_increase|intcomma}}</strong></h3>
+            <h3><strong>${{balance_increase|floatformat:2|intcomma}}</strong></h3>
             {% else %}
             <h3 style="color:red;">
-                <strong>${{balance_increase|intcomma}}&darr;</strong>
+                <strong>${{balance_increase|floatformat:2|intcomma}}&darr;</strong>
             </h3>
             {% endif %}
         {% endif %}
