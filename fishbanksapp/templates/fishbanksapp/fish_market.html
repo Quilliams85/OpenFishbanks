@@ -24,7 +24,7 @@
     {% for fish in species %}
     <div class="card">
         <h2>{{ fish.name }}</h2>
-        <p><strong>Current market value:</strong> ${{ fish.value }}</p>
+        <p><strong>Current market value:</strong> ${{ fish.value|floatformat:2 }}</p>
         <p><strong>Found in: </strong>{{ fish.harbor }}</p>
 
     </div>

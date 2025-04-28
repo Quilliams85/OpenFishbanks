@@ -74,7 +74,7 @@
                     {{ user.username}}
                 </a>
                 {% endif %}
-                <p><strong>Balance: </strong>{{user.profile.balance|intcomma}}</p>
+                <p><strong>Balance: </strong>{{user.profile.balance|floatformat:2|intcomma}}</p>
                 <p><strong>Joined: </strong>{{user.date_joined}}</p>
             </li>
         {% endfor %}

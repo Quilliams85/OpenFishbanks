@@ -30,31 +30,32 @@ def setup_sim():
 
 
     fish_species_data = [
-        {"name": "Bluefin Tuna", "value": 20.0, "weight": 60.0, "harbor": ironhook, "C": int(80000 * random.uniform(9, 13)), "k": 0.005},
-        {"name": "Yellowfin Tuna", "value": 2.3, "weight": 45.0, "harbor": caldera_bay, "C": int(100000 * random.uniform(9, 13)), "k": 0.007},
-        {"name": "Halibut", "value": 13.5, "weight": 25.0, "harbor": stormrest, "C": int(95000 * random.uniform(9, 13)), "k": 0.008},
+        {"name": "Bluefin Tuna", "value": 15.0, "weight": 60.0, "harbor": ironhook, "C": 800000, "k": 0.00167},
+        {"name": "Yellowfin Tuna", "value": 10.5, "weight": 45.0, "harbor": caldera_bay, "C": 1000000, "k": 0.00233},
+        {"name": "Halibut", "value": 12.0, "weight": 25.0, "harbor": stormrest, "C": 950000, "k": 0.00267},
 
-        {"name": "Bigeye Tuna", "value": 6.5, "weight": 35.0, "harbor": port_greenwood, "C": int(90000 * random.uniform(9, 13)), "k": 0.009},
-        {"name": "Atlantic Cod", "value": 9.0, "weight": 3.0, "harbor": eastwind, "C": int(60000 * random.uniform(9, 13)), "k": 0.012},
-        {"name": "Atlantic Mackerel", "value": 11.87, "weight": 1.8, "harbor": seabright, "C": int(70000 * random.uniform(9, 13)), "k": 0.015},
-        {"name": "Swordfish", "value": 10.0, "weight": 30.0, "harbor": caldera_bay, "C": int(85000 * random.uniform(9, 13)), "k": 0.008},
-        {"name": "Snapper", "value": 8.4, "weight": 3.2, "harbor": eastwind, "C": int(55000 * random.uniform(9, 13)), "k": 0.012},
+        {"name": "Bigeye Tuna", "value": 10.5, "weight": 35.0, "harbor": port_greenwood, "C": 900000, "k": 0.00300},
+        {"name": "Atlantic Cod", "value": 9.75, "weight": 3.0, "harbor": eastwind, "C": 600000, "k": 0.00400},
+        {"name": "Atlantic Mackerel", "value": 10.5, "weight": 1.8, "harbor": seabright, "C": 700000, "k": 0.00500},
+        {"name": "Swordfish", "value": 12.0, "weight": 30.0, "harbor": caldera_bay, "C": 850000, "k": 0.00267},
+        {"name": "Snapper", "value": 10.5, "weight": 3.2, "harbor": eastwind, "C": 550000, "k": 0.00400},
 
-        {"name": "Grouper", "value": 12.0, "weight": 4.5, "harbor": moonstone, "C": int(40000 * random.uniform(9, 13)), "k": 0.014},
-        {"name": "Dogfish", "value": 3.8, "weight": 2.3, "harbor": hollow, "C": int(35000 * random.uniform(9, 13)), "k": 0.018},
-        {"name": "Eel", "value": 6.0, "weight": 1.5, "harbor": seabright, "C": int(42000 * random.uniform(9, 13)), "k": 0.017},
-        {"name": "Pangasius", "value": 1.8, "weight": 1.2, "harbor": driftwood, "C": int(30000 * random.uniform(9, 13)), "k": 0.018},
-        {"name": "Tilapia", "value": 2.0, "weight": 1.0, "harbor": driftwood, "C": int(32000 * random.uniform(9, 13)), "k": 0.018},
-        {"name": "Mahi Mahi", "value": 9.7, "weight": 6.0, "harbor": stormrest, "C": int(60000 * random.uniform(9, 13)), "k": 0.012},
+        {"name": "Grouper", "value": 12.0, "weight": 4.5, "harbor": moonstone, "C": 400000, "k": 0.00467},
+        {"name": "Dogfish", "value": 9.0, "weight": 2.3, "harbor": hollow, "C": 350000, "k": 0.00600},
+        {"name": "Eel", "value": 9.0, "weight": 1.5, "harbor": seabright, "C": 420000, "k": 0.00567},
+        {"name": "Pangasius", "value": 7.5, "weight": 1.2, "harbor": driftwood, "C": 300000, "k": 0.00600},
+        {"name": "Tilapia", "value": 7.5, "weight": 1.0, "harbor": driftwood, "C": 320000, "k": 0.00600},
+        {"name": "Mahi Mahi", "value": 10.5, "weight": 6.0, "harbor": stormrest, "C": 600000, "k": 0.00400},
 
-        {"name": "Sardine", "value": 1.5, "weight": 0.15, "harbor": sandbar, "C": int(20000 * random.uniform(9, 13)), "k": 0.02},
-        {"name": "Atlantic Herring", "value": 3.0, "weight": 0.2, "harbor": sandbar, "C": int(25000 * random.uniform(9, 13)), "k": 0.018},
-        {"name": "Haddock", "value": 7.2, "weight": 2.5, "harbor": hollow, "C": int(30000 * random.uniform(9, 13)), "k": 0.016},
+        {"name": "Sardine", "value": 6.0, "weight": 0.15, "harbor": sandbar, "C": 200000, "k": 0.00667},
+        {"name": "Atlantic Herring", "value": 6.0, "weight": 0.2, "harbor": sandbar, "C": 250000, "k": 0.00600},
+        {"name": "Haddock", "value": 9.75, "weight": 2.5, "harbor": hollow, "C": 300000, "k": 0.00533},
 
-        {"name": "Peruvian Anchoveta", "value": 15.0, "weight": 0.025, "harbor": sandbar, "C": int(50000 * random.uniform(9, 13)), "k": 0.02},
-        {"name": "Alaska Pollock", "value": 5.81, "weight": 0.7, "harbor": port_greenwood, "C": int(40000 * random.uniform(9, 13)), "k": 0.015},
-        {"name": "Skipjack Tuna", "value": 4.1, "weight": 2.0, "harbor": moonstone, "C": int(60000 * random.uniform(9, 13)), "k": 0.014},
+        {"name": "Peruvian Anchoveta", "value": 7.5, "weight": 0.025, "harbor": sandbar, "C": 500000, "k": 0.00667},
+        {"name": "Alaska Pollock", "value": 9.0, "weight": 0.7, "harbor": port_greenwood, "C": 400000, "k": 0.00500},
+        {"name": "Skipjack Tuna", "value": 9.0, "weight": 2.0, "harbor": moonstone, "C": 600000, "k": 0.00467},
     ]
+
 
 
     for data in fish_species_data:
@@ -73,65 +74,115 @@ def setup_sim():
     ManufacturerShip.objects.create(
         name="Outrigger Trawler",
         fishing_capacity=5000,
-        fishing_rate=500,
+        fishing_rate=2500,
         base_cost=50000,
-        description="A versatile and cost-effective trawler, perfect for small-scale fishing operations. Ideal for coastal waters with a capacity of 5,000 kg and a steady catch rate."
+        description="A versatile and cost-effective trawler, ideal for coastal waters."
+    )
+
+    ManufacturerShip.objects.create(
+        name="Small Seiner",
+        fishing_capacity=8000,
+        fishing_rate=4000,
+        base_cost=90000,
+        description="A compact seiner for efficient small-to-medium scale fishing."
     )
 
     ManufacturerShip.objects.create(
         name="Seiner",
         fishing_capacity=15000,
-        fishing_rate=1500,
+        fishing_rate=7500,
         base_cost=200000,
-        description="A reliable vessel designed for medium-scale fishing. Equipped with advanced netting systems, it can handle larger catches of up to 15,000 kg with improved efficiency."
+        description="A reliable vessel with advanced netting for larger catches."
+    )
+
+    ManufacturerShip.objects.create(
+        name="Large Seiner",
+        fishing_capacity=23000,
+        fishing_rate=11500,
+        base_cost=325000,
+        description="Enhanced storage and hauling systems for bigger fishing hauls."
     )
 
     ManufacturerShip.objects.create(
         name="Stern Trawler",
-        fishing_capacity=30000,
-        fishing_rate=4500,
+        fishing_capacity=45000,
+        fishing_rate=22500,
         base_cost=500000,
-        description="A robust trawler built for deep-sea fishing. With a massive 30,000 kg capacity and high-speed hauling, it's perfect for commercial fishing ventures."
+        description="A robust deep-sea trawler for high-volume commercial ventures."
+    )
+
+    ManufacturerShip.objects.create(
+        name="Ocean Stern Trawler",
+        fishing_capacity=60000,
+        fishing_rate=30000,
+        base_cost=750000,
+        description="Extended range and reinforced hull for heavier catches."
     )
 
     ManufacturerShip.objects.create(
         name="Longliner",
-        fishing_capacity=50000,
-        fishing_rate=5000,
+        fishing_capacity=75000,
+        fishing_rate=37500,
         base_cost=1000000,
-        description="A high-capacity vessel designed for longline fishing. Capable of handling 50,000 kg of catch, it's suited for large-scale operations in open waters."
+        description="A high-capacity longliner suited for open ocean expeditions."
+    )
+
+    ManufacturerShip.objects.create(
+        name="Industrial Longliner",
+        fishing_capacity=125000,
+        fishing_rate=62500,
+        base_cost=2000000,
+        description="Industrial-scale longliner designed for massive sustained catches."
     )
 
     ManufacturerShip.objects.create(
         name="Factory Longliner",
         fishing_capacity=250000,
-        fishing_rate=25000,
+        fishing_rate=125000,
         base_cost=10000000,
-        description="The ultimate fishing vessel, combining massive capacity (250,000 kg) with industrial-grade processing capabilities. Designed for the largest and most demanding fishing operations."
+        description="Combines massive capacity with onboard processing plants."
     )
+
+    ManufacturerShip.objects.create(
+        name="Mini Factory Ship",
+        fishing_capacity=400000,
+        fishing_rate=200000,
+        base_cost=20000000,
+        description="A smaller factory ship with significant automation and storage."
+    )
+
     ManufacturerShip.objects.create(
         name="Automated Factory Ship",
-        fishing_capacity=750000,
-        fishing_rate=60000,
+        fishing_capacity=600000,
+        fishing_rate=300000,
         base_cost=35000000,
-        description="A behemoth of the sea, this fully automated factory ship integrates AI-driven trawling systems and onboard processing. With a staggering 750,000 kg capacity, it's designed for relentless, efficient harvesting on a global scale."
+        description="Fully automated giant trawler with AI-driven harvesting systems."
+    )
+
+    ManufacturerShip.objects.create(
+        name="Hyper Trawler",
+        fishing_capacity=900000,
+        fishing_rate=450000,
+        base_cost=60000000,
+        description="High-efficiency vessel maximizing catch volume and speed."
     )
 
     ManufacturerShip.objects.create(
         name="Oceanic Megatrawler",
-        fishing_capacity=1500000,
-        fishing_rate=125000,
+        fishing_capacity=1250000,
+        fishing_rate=625000,
         base_cost=100000000,
-        description="The Oceanic Megatrawler is the pinnacle of fishing technology—capable of processing multiple species simultaneously and storing up to 1.5 million kg. Operates continuously for weeks with onboard freezing and logistics facilities."
+        description="Pinnacle of fishing technology; massive storage and processing."
     )
 
     ManufacturerShip.objects.create(
         name="Leviathan Dredger",
         fishing_capacity=3000000,
-        fishing_rate=300000,
+        fishing_rate=1500000,
         base_cost=250000000,
-        description="An ultra-massive, world-spanning dredger capable of reshaping marine economies. With a 3 million kg capacity and unmatched rate, the Leviathan Dredger is reserved for industrial-scale operations and legendary captains."
+        description="The ultimate ultra-massive dredger reshaping marine economies."
     )
+
 
 
     time = InGameTime.objects.create(game_start_time=1893477600)
@@ -139,7 +190,9 @@ def setup_sim():
 
 
 def reset_db():
-    User.objects.all().delete()
+    for user in User.objects.all():
+        user.profile.balance = 20000.0
+        user.save()
     FishSpecies.objects.all().delete()
     ManufacturerShip.objects.all().delete()
     Ship.objects.all().delete()
