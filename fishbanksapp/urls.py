@@ -40,4 +40,5 @@ urlpatterns = [
     path('settings/', settings_view, name='settings'),
     path('api/get-species', views.export_fish_data_csv, name='get_species'),
     path('api/get-leaderboard', views.api_leaderboard, name='get_leaderboard'),
+    path('net-leaderboard', views.net_worth_leaderboard, name='net-leaderboard')
 ]

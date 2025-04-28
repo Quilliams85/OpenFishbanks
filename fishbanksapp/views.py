@@ -525,3 +525,31 @@ def api_leaderboard(request):
         usernames[user.username] = user.profile.balance
 
     return JsonResponse(usernames)
+
+def net_worth_leaderboard(request):
+    users = User.objects.all()
+    user_groups = {}
+
+    net_worths = {}
+    for user in users:
+        balance = user.profile.balance
+        for ship in Ship.objects.filter(owner=user):
+            balance += ship.value
+        net_worths[user.username] = balance
+
+    sorted_users = sorted(users, key=lambda user: net_worths[user.username], reverse=True)
+
+    for user in sorted_users:  # get groups for user and assign in dict
+        groups = Group.objects.filter(members=user)
+        if not groups:
+            user_groups[user] = None
+        else:
+            for group in groups:      
+                user_groups[user] = group
+
+    context = {
+        'users': sorted_users,
+        'user_groups': user_groups,
+        'net_worths': net_worths,
+    }
+    return render(request, 'fishbanksapp/net_leaderboard.html', context)

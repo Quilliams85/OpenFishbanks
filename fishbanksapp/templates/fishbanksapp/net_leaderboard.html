@@ -1,0 +1,83 @@
+{% extends 'fishbanksapp/base.html' %}
+{% load auction_tags %}
+{% load humanize %}
+{% block content %}
+<head>
+    <style>
+        ol {
+            list-style-type: none;
+            padding: 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        ol li {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            counter-increment: rank; /* Add counter for rank */
+            position: relative;
+        }
+        ol li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        ol li::before {
+            content: counter(rank); /* Display the rank number */
+            position: absolute;
+            left: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #76ABAE;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        ol li a {
+            text-decoration: none;
+            color: #31363F;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        ol li a:hover {
+            text-decoration: underline;
+        }
+        ol li p {
+            margin: 10px 0;
+            color: #555;
+        }
+        ol li p:last-child {
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <h1>Top Fisheries</h1>
+    <ol>
+        {% for user in users %}
+            <li>
+                {% if user_groups|hash:user%}
+                <a href="{% url 'user_profile' username=user.username %}">
+                    {{ user.username}}[{{user_groups|hash:user}}]
+                </a>
+                {% else %}
+                <a href="{% url 'user_profile' username=user.username %}">
+                    {{ user.username}}
+                </a>
+                {% endif %}
+                <p><strong>Net Worth: </strong>${{ net_worths|get_item:user.username|floatformat:2|intcomma }}</p>
+                <p><strong>Joined: </strong>{{user.date_joined}}</p>
+            </li>
+        {% endfor %}
+    </ol>
+</body>
+{% endblock %}
