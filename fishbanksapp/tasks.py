@@ -51,9 +51,9 @@ def return_ships():
                     items[f'{fish_type.name} catch from {ship.nickname}[{ship.id}]'] = revenue
 
                 if Gas.objects.first() != None:
-                    costs[f'gas for {ship.nickname}'] = ship.fishing_capacity * Gas.objects.first().price
-                costs[f'worker salaries for {ship.nickname}'] = 1 * ship.fishing_capacity
-                costs[f'harbor fee for {ship.nickname} @ {ship.harbor.name}'] = ship.harbor.storage_fee
+                    costs[f'gas for {ship.nickname} [{ship.id}]'] = ship.fishing_capacity * Gas.objects.first().price
+                costs[f'worker salaries for {ship.nickname} [{ship.id}]'] = 1 * ship.fishing_capacity
+                costs[f'harbor fee for {ship.nickname} @ {ship.harbor.name} [{ship.id}]'] = ship.harbor.storage_fee
         if not none_assigned:
             invoice = Invoice.objects.create(user=user, revenues=items, costs=costs, date=current_time)
             user.profile.balance += invoice.getProfit()
