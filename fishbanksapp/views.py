@@ -367,7 +367,7 @@ def create_listing(request, ship_id):
 @login_required
 def buy_now(request, auction_id):
     listing = AuctionListing.objects.get(id=auction_id)
-    if (request.user.profile.balance > listing.current_bid) and listing.status == 'pending':
+    if (request.user.profile.balance > listing.buy_now_price) and listing.status == 'pending':
         listing.current_bidder = request.user
         listing.current_bid = listing.buy_now_price
         listing.save()
