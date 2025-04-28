@@ -62,7 +62,7 @@ def return_ships():
     update_market_value(species_fished)
 
 def update_market_value(dict):
-    base_change = 0.9
+    base_change = 0.98
     total_fish = 0
     fluctuation_constant = 0.1
     if dict != None:
