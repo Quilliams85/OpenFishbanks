@@ -56,7 +56,7 @@
         <div class="card">
             <h2>{{ ship.name }}</h2>
             <p><strong>Price:</strong> ${{ ship.base_cost|intcomma }}</p>
-            <p><strong>Maximum Fishing Rate:</strong> {{ ship.fishing_rate|intcomma }} fish/turn</p>
+            <p><strong>Maximum Fishing Rate:</strong> {{ ship.fishing_rate|intcomma }} kg/fishing cycle</p>
             <p><strong>Maximum Capacity:</strong> {{ ship.fishing_capacity|intcomma }} kg</p>
             <p><strong>Ships in Stock:</strong> 
                 <span class="{% if ship.stock <= 2 %}stock-low{% endif %}">{{ ship.stock }}</span>
