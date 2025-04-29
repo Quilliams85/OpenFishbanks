@@ -13,6 +13,8 @@ from datetime import datetime, timedelta
 from .utils import send_invitation_email
 import csv
 from collections import defaultdict
+from django.utils import timezone
+from datetime import time
 
 # Create your views here.
 
@@ -28,16 +30,25 @@ def home(request):
 
 
 def shop(request):
-    listings = AuctionListing.objects.filter(status='pending').exclude(listing_owner=request.user)
-    ships = ManufacturerShip.objects.all()
+    now = timezone.localtime().time()  # This will be in your project's TIME_ZONE
 
-    bid_forms = {listing.id: BidForm() for listing in listings}
+    # Define quiet hours (23:00 to 09:00)
+    start = time(23, 0)
+    end = time(7, 0)
 
-    return render(request, 'fishbanksapp/shop.html', {
-        'ships': ships,
-        'listings': listings,
-        'bid_forms': bid_forms
-    })
+    if start <= now or now <= end:
+        return render(request, 'fishbanksapp/shop_offline.html')
+    else:
+        listings = AuctionListing.objects.filter(status='pending').exclude(listing_owner=request.user)
+        ships = ManufacturerShip.objects.all()
+
+        bid_forms = {listing.id: BidForm() for listing in listings}
+
+        return render(request, 'fishbanksapp/shop.html', {
+            'ships': ships,
+            'listings': listings,
+            'bid_forms': bid_forms
+        })
 
 @login_required
 def purchase_ship(request, ship_id):
