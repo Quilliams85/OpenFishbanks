@@ -457,7 +457,7 @@ def respond_to_trade(request, trade_id, response):
 
     if response == 'accept':
         # Transfer money
-        if trade.sender.profile.balance >= trade.money_offered and trade.recipient.profile.balance >= trade.money_requested:
+        if trade.sender.profile.balance >= trade.money_offered and trade.recipient.profile.balance >= trade.money_requested and trade.money_offered>=0 and trade.money_requested>=0:
             date = InGameTime.objects.first().getFormattedTime()
             Transaction.objects.create(sender=trade.sender, reciever=trade.recipient,
             transaction_type=Transaction.TransactionType.STORE_TO_PLAYER,
