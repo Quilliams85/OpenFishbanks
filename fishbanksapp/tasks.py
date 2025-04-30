@@ -62,7 +62,7 @@ def return_ships():
     update_market_value(species_fished)
 
 def update_market_value(dict):
-    base_change = 0.98
+    base_change = 0.99
     total_fish = 0
     fluctuation_constant = 0.1
     if dict != None:
@@ -71,7 +71,7 @@ def update_market_value(dict):
     
     for species in FishSpecies.objects.all():
         prop = dict[f'{species.name}'] / total_fish
-        species.value /= ((base_change + prop*fluctuation_constant) * random.uniform(0.9,1.112))
+        species.value /= (base_change + prop*fluctuation_constant)
         species.save()
 
 @shared_task
