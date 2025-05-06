@@ -494,37 +494,38 @@ def respond_to_trade(request, trade_id, response):
 
 
 def export_fish_data_csv(request):
-    # Step 1: Gather all history entries and round timestamps
     species_names = [species.name for species in FishSpecies.objects.all()]
     data_by_time = defaultdict(dict)
 
     for species in FishSpecies.objects.all():
         for his in species.history.all():
-            # Round to nearest second (or minute, if you prefer)
-            rounded_time = his.history_date.replace(microsecond=0)
-            data_by_time[rounded_time][species.name] = his.population
+            timestamp = his.history_date
+            if is_aware(timestamp):
+                timestamp = make_naive(timestamp)
 
-    # Step 2: Sort timestamps
-    sorted_timestamps = sorted(data_by_time.keys())
+            # Round down to the nearest 30-minute bucket
+            bucket_time = timestamp.replace(minute=(timestamp.minute // 30) * 30, second=0, microsecond=0)
+            data_by_time[bucket_time][species.name] = his.population
+
+    # Step 2: Sort bucket timestamps
+    sorted_buckets = sorted(data_by_time.keys())
 
     # Step 3: Prepare CSV response
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="fish_data.csv"'
+    response['Content-Disposition'] = 'attachment; filename="fish_population_history.csv"'
 
     writer = csv.writer(response)
     writer.writerow(['timestamp'] + species_names)
 
-    # Step 4: Build and write rows
+    # Step 4: Track last known values for species and write rows
     last_known_values = {name: '' for name in species_names}
 
-    for timestamp in sorted_timestamps:
-        # Update last known values if available
+    for bucket in sorted_buckets:
         for name in species_names:
-            if name in data_by_time[timestamp]:
-                last_known_values[name] = data_by_time[timestamp][name]
+            if name in data_by_time[bucket]:
+                last_known_values[name] = data_by_time[bucket][name]
 
-        # Write row with the most recent known values
-        row = [timestamp] + [last_known_values[name] for name in species_names]
+        row = [bucket] + [last_known_values[name] for name in species_names]
         writer.writerow(row)
 
     return response
