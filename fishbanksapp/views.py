@@ -15,7 +15,7 @@ import csv
 from collections import defaultdict
 from django.utils import timezone
 from datetime import time
-from django.utils.timezone import make_naive
+from django.utils.timezone import make_naive, is_aware
 
 
 # Create your views here.
@@ -569,32 +569,41 @@ def net_worth_leaderboard(request):
 
 
 def get_fish_data(request):
-    # Get all historical records for all fish species
-    histories = FishSpecies.history.all().order_by('history_date')
-
-    # Group by species name and 30-minute time buckets
+    # Map: timestamp -> species_name -> value
     time_buckets = defaultdict(lambda: defaultdict(float))
+    species_names = []
 
-    for record in histories:
-        timestamp = make_naive(record.history_date)
-        bucket_time = timestamp.replace(minute=(timestamp.minute // 30) * 30, second=0, microsecond=0)
-        time_buckets[bucket_time][record.name] = record.value
+    # Loop through each FishSpecies instance
+    for fish in FishSpecies.objects.all():
+        species_name = fish.name
+        species_names.append(species_name)
 
-    # Get all unique species names to make consistent columns
-    species_names = sorted(set(record.name for record in histories))
+        # Get historical records for just this fish
+        for record in fish.history.all().order_by('history_date'):
+            timestamp = record.history_date
+            if is_aware(timestamp):
+                timestamp = make_naive(timestamp)
 
-    # Create HTTP response with CSV
+            # Round down to 30-minute bucket
+            bucket_time = timestamp.replace(minute=(timestamp.minute // 30) * 30, second=0, microsecond=0)
+            time_buckets[bucket_time][species_name] = record.value
+
+    # Sort species names
+    species_names = sorted(set(species_names))
+
+    # Create CSV response
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="fish_market_history.csv"'
-
     writer = csv.writer(response)
-    header = ['timestamp'] + species_names
-    writer.writerow(header)
 
-    for bucket in sorted(time_buckets.keys()):
-        row = [bucket]
-        for species in species_names:
-            row.append(time_buckets[bucket].get(species, ''))  # Empty if no data for this bucket
+    # Header
+    writer.writerow(['timestamp'] + species_names)
+
+    # Rows
+    for bucket_time in sorted(time_buckets.keys()):
+        row = [bucket_time]
+        for name in species_names:
+            row.append(time_buckets[bucket_time].get(name, ''))
         writer.writerow(row)
 
     return response
