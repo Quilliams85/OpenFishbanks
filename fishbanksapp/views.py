@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import Ship, FishSpecies, InGameTime, Invoice, Harbor, ManufacturerShip, Group, Invitation, Transaction, AuctionListing, TradeRequest
+from .models import Ship, FishSpecies, InGameTime, Invoice, Harbor, ManufacturerShip, Group, Invitation, Transaction, AuctionListing, TradeRequest, Profile
 from django.db.models import Count
 from django.contrib.auth.models import User
 from .forms import ShipForm, ShipUpdateForm, GroupForm, InviteUserForm, AuctionListingForm, BidForm, TradeRequestForm
@@ -15,6 +15,8 @@ import csv
 from collections import defaultdict
 from django.utils import timezone
 from datetime import time
+from django.utils.timezone import make_naive
+
 
 # Create your views here.
 
@@ -564,3 +566,61 @@ def net_worth_leaderboard(request):
         'net_worths': net_worths,
     }
     return render(request, 'fishbanksapp/net_leaderboard.html', context)
+
+
+def get_fish_data(request):
+    # Get all historical records for all fish species
+    histories = FishSpecies.history.all().order_by('history_date')
+
+    # Group by species name and 30-minute time buckets
+    time_buckets = defaultdict(lambda: defaultdict(float))
+
+    for record in histories:
+        timestamp = make_naive(record.history_date)
+        bucket_time = timestamp.replace(minute=(timestamp.minute // 30) * 30, second=0, microsecond=0)
+        time_buckets[bucket_time][record.name] = record.value
+
+    # Get all unique species names to make consistent columns
+    species_names = sorted(set(record.name for record in histories))
+
+    # Create HTTP response with CSV
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="fish_market_history.csv"'
+
+    writer = csv.writer(response)
+    header = ['timestamp'] + species_names
+    writer.writerow(header)
+
+    for bucket in sorted(time_buckets.keys()):
+        row = [bucket]
+        for species in species_names:
+            row.append(time_buckets[bucket].get(species, ''))  # Empty if no data for this bucket
+        writer.writerow(row)
+
+    return response
+
+def get_user_data(request):
+    histories = Profile.history.select_related('user').all().order_by('history_date')
+    time_buckets = defaultdict(lambda: defaultdict(float))
+
+    for record in histories:
+        timestamp = make_naive(record.history_date)
+        bucket_time = timestamp.replace(minute=(timestamp.minute // 30) * 30, second=0, microsecond=0)
+        username = record.user.username if record.user else 'Unknown'
+        time_buckets[bucket_time][username] = record.balance
+
+    usernames = sorted({record.user.username for record in histories if record.user})
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="user_balance_history.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['timestamp'] + usernames)
+
+    for bucket_time in sorted(time_buckets.keys()):
+        row = [bucket_time]
+        for username in usernames:
+            row.append(time_buckets[bucket_time].get(username, ''))
+        writer.writerow(row)
+
+    return response
