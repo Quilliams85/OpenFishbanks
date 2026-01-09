@@ -6,6 +6,9 @@
 This platform enables participants to engage in a dynamic, multiplayer game that simulates the complexities of managing renewable resources, particularly fisheries.  
 Ideal for educational settings, workshops, and research, OpenFishbanks offers an interactive environment to explore concepts in sustainability, economics, and resource management.
 
+View Paper here: [Senior_Project_Paper.pdf](Senior_Project_Paper.pdf)
+View Poser here: [Senior Project Poster.pdf](Senior Project Poster.pdf)
+
 ---
 
 ## Features
